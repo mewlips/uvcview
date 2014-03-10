@@ -10,10 +10,10 @@ echo '#include <stdio.h>
 #include <asm/types.h>
 #include <linux/videodev2.h>
 
-#define PRINT_CONST(c) printf("pub static %s: c_ulong = 0x%x;\n", #c, c)
+#define PRINT_CONST(c) printf("pub static %s:u32 = 0x%x;\n", #c, c)
 
 int main(void) {
-    printf("#[allow(dead_code)];\n\nuse libc::c_ulong;\n\n");
+    printf("#[allow(dead_code)];\n");
 ' > $GEN_C_SOURCE
 
 IFS=$'\n'

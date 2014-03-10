@@ -5,993 +5,994 @@
 use std::default::Default;
 use std::libc::{c_int,c_schar,c_uint,c_ulong,c_void};
 use std::libc::types::os::common::posix01::{timespec,timeval};
+use std::os::errno;
 
 //#define VIDEO_MAX_FRAME 32
-pub static VIDEO_MAX_FRAME: c_ulong = 0x20;
+pub static VIDEO_MAX_FRAME: u32 = 0x20;
 //#define VIDEO_MAX_PLANES 8
-pub static VIDEO_MAX_PLANES: c_ulong = 0x8;
+pub static VIDEO_MAX_PLANES: u32 = 0x8;
 //#define VID_TYPE_CAPTURE 1 /* Can capture */
-pub static VID_TYPE_CAPTURE: c_ulong = 0x1;
+pub static VID_TYPE_CAPTURE: u32 = 0x1;
 //#define VID_TYPE_TUNER 2 /* Can tune */
-pub static VID_TYPE_TUNER: c_ulong = 0x2;
+pub static VID_TYPE_TUNER: u32 = 0x2;
 //#define VID_TYPE_TELETEXT 4 /* Does teletext */
-pub static VID_TYPE_TELETEXT: c_ulong = 0x4;
+pub static VID_TYPE_TELETEXT: u32 = 0x4;
 //#define VID_TYPE_OVERLAY 8 /* Overlay onto frame buffer */
-pub static VID_TYPE_OVERLAY: c_ulong = 0x8;
+pub static VID_TYPE_OVERLAY: u32 = 0x8;
 //#define VID_TYPE_CHROMAKEY 16 /* Overlay by chromakey */
-pub static VID_TYPE_CHROMAKEY: c_ulong = 0x10;
+pub static VID_TYPE_CHROMAKEY: u32 = 0x10;
 //#define VID_TYPE_CLIPPING 32 /* Can clip */
-pub static VID_TYPE_CLIPPING: c_ulong = 0x20;
+pub static VID_TYPE_CLIPPING: u32 = 0x20;
 //#define VID_TYPE_FRAMERAM 64 /* Uses the frame buffer memory */
-pub static VID_TYPE_FRAMERAM: c_ulong = 0x40;
+pub static VID_TYPE_FRAMERAM: u32 = 0x40;
 //#define VID_TYPE_SCALES 128 /* Scalable */
-pub static VID_TYPE_SCALES: c_ulong = 0x80;
+pub static VID_TYPE_SCALES: u32 = 0x80;
 //#define VID_TYPE_MONOCHROME 256 /* Monochrome only */
-pub static VID_TYPE_MONOCHROME: c_ulong = 0x100;
+pub static VID_TYPE_MONOCHROME: u32 = 0x100;
 //#define VID_TYPE_SUBCAPTURE 512 /* Can capture subareas of the image */
-pub static VID_TYPE_SUBCAPTURE: c_ulong = 0x200;
+pub static VID_TYPE_SUBCAPTURE: u32 = 0x200;
 //#define VID_TYPE_MPEG_DECODER 1024 /* Can decode MPEG streams */
-pub static VID_TYPE_MPEG_DECODER: c_ulong = 0x400;
+pub static VID_TYPE_MPEG_DECODER: u32 = 0x400;
 //#define VID_TYPE_MPEG_ENCODER 2048 /* Can encode MPEG streams */
-pub static VID_TYPE_MPEG_ENCODER: c_ulong = 0x800;
+pub static VID_TYPE_MPEG_ENCODER: u32 = 0x800;
 //#define VID_TYPE_MJPEG_DECODER 4096 /* Can decode MJPEG streams */
-pub static VID_TYPE_MJPEG_DECODER: c_ulong = 0x1000;
+pub static VID_TYPE_MJPEG_DECODER: u32 = 0x1000;
 //#define VID_TYPE_MJPEG_ENCODER 8192 /* Can encode MJPEG streams */
-pub static VID_TYPE_MJPEG_ENCODER: c_ulong = 0x2000;
+pub static VID_TYPE_MJPEG_ENCODER: u32 = 0x2000;
 //#define V4L2_CAP_VIDEO_CAPTURE 0x00000001 /* Is a video capture device */
-pub static V4L2_CAP_VIDEO_CAPTURE: c_ulong = 0x1;
+pub static V4L2_CAP_VIDEO_CAPTURE: u32 = 0x1;
 //#define V4L2_CAP_VIDEO_OUTPUT 0x00000002 /* Is a video output device */
-pub static V4L2_CAP_VIDEO_OUTPUT: c_ulong = 0x2;
+pub static V4L2_CAP_VIDEO_OUTPUT: u32 = 0x2;
 //#define V4L2_CAP_VIDEO_OVERLAY 0x00000004 /* Can do video overlay */
-pub static V4L2_CAP_VIDEO_OVERLAY: c_ulong = 0x4;
+pub static V4L2_CAP_VIDEO_OVERLAY: u32 = 0x4;
 //#define V4L2_CAP_VBI_CAPTURE 0x00000010 /* Is a raw VBI capture device */
-pub static V4L2_CAP_VBI_CAPTURE: c_ulong = 0x10;
+pub static V4L2_CAP_VBI_CAPTURE: u32 = 0x10;
 //#define V4L2_CAP_VBI_OUTPUT 0x00000020 /* Is a raw VBI output device */
-pub static V4L2_CAP_VBI_OUTPUT: c_ulong = 0x20;
+pub static V4L2_CAP_VBI_OUTPUT: u32 = 0x20;
 //#define V4L2_CAP_SLICED_VBI_CAPTURE 0x00000040 /* Is a sliced VBI capture device */
-pub static V4L2_CAP_SLICED_VBI_CAPTURE: c_ulong = 0x40;
+pub static V4L2_CAP_SLICED_VBI_CAPTURE: u32 = 0x40;
 //#define V4L2_CAP_SLICED_VBI_OUTPUT 0x00000080 /* Is a sliced VBI output device */
-pub static V4L2_CAP_SLICED_VBI_OUTPUT: c_ulong = 0x80;
+pub static V4L2_CAP_SLICED_VBI_OUTPUT: u32 = 0x80;
 //#define V4L2_CAP_RDS_CAPTURE 0x00000100 /* RDS data capture */
-pub static V4L2_CAP_RDS_CAPTURE: c_ulong = 0x100;
+pub static V4L2_CAP_RDS_CAPTURE: u32 = 0x100;
 //#define V4L2_CAP_VIDEO_OUTPUT_OVERLAY 0x00000200 /* Can do video output overlay */
-pub static V4L2_CAP_VIDEO_OUTPUT_OVERLAY: c_ulong = 0x200;
+pub static V4L2_CAP_VIDEO_OUTPUT_OVERLAY: u32 = 0x200;
 //#define V4L2_CAP_HW_FREQ_SEEK 0x00000400 /* Can do hardware frequency seek */
-pub static V4L2_CAP_HW_FREQ_SEEK: c_ulong = 0x400;
+pub static V4L2_CAP_HW_FREQ_SEEK: u32 = 0x400;
 //#define V4L2_CAP_RDS_OUTPUT 0x00000800 /* Is an RDS encoder */
-pub static V4L2_CAP_RDS_OUTPUT: c_ulong = 0x800;
+pub static V4L2_CAP_RDS_OUTPUT: u32 = 0x800;
 //#define V4L2_CAP_VIDEO_CAPTURE_MPLANE 0x00001000
-pub static V4L2_CAP_VIDEO_CAPTURE_MPLANE: c_ulong = 0x1000;
+pub static V4L2_CAP_VIDEO_CAPTURE_MPLANE: u32 = 0x1000;
 //#define V4L2_CAP_VIDEO_OUTPUT_MPLANE 0x00002000
-pub static V4L2_CAP_VIDEO_OUTPUT_MPLANE: c_ulong = 0x2000;
+pub static V4L2_CAP_VIDEO_OUTPUT_MPLANE: u32 = 0x2000;
 //#define V4L2_CAP_VIDEO_M2M_MPLANE 0x00004000
-pub static V4L2_CAP_VIDEO_M2M_MPLANE: c_ulong = 0x4000;
+pub static V4L2_CAP_VIDEO_M2M_MPLANE: u32 = 0x4000;
 //#define V4L2_CAP_VIDEO_M2M 0x00008000
-pub static V4L2_CAP_VIDEO_M2M: c_ulong = 0x8000;
+pub static V4L2_CAP_VIDEO_M2M: u32 = 0x8000;
 //#define V4L2_CAP_TUNER 0x00010000 /* has a tuner */
-pub static V4L2_CAP_TUNER: c_ulong = 0x10000;
+pub static V4L2_CAP_TUNER: u32 = 0x10000;
 //#define V4L2_CAP_AUDIO 0x00020000 /* has audio support */
-pub static V4L2_CAP_AUDIO: c_ulong = 0x20000;
+pub static V4L2_CAP_AUDIO: u32 = 0x20000;
 //#define V4L2_CAP_RADIO 0x00040000 /* is a radio device */
-pub static V4L2_CAP_RADIO: c_ulong = 0x40000;
+pub static V4L2_CAP_RADIO: u32 = 0x40000;
 //#define V4L2_CAP_MODULATOR 0x00080000 /* has a modulator */
-pub static V4L2_CAP_MODULATOR: c_ulong = 0x80000;
+pub static V4L2_CAP_MODULATOR: u32 = 0x80000;
 //#define V4L2_CAP_READWRITE 0x01000000 /* read/write systemcalls */
-pub static V4L2_CAP_READWRITE: c_ulong = 0x1000000;
+pub static V4L2_CAP_READWRITE: u32 = 0x1000000;
 //#define V4L2_CAP_ASYNCIO 0x02000000 /* async I/O */
-pub static V4L2_CAP_ASYNCIO: c_ulong = 0x2000000;
+pub static V4L2_CAP_ASYNCIO: u32 = 0x2000000;
 //#define V4L2_CAP_STREAMING 0x04000000 /* streaming I/O ioctls */
-pub static V4L2_CAP_STREAMING: c_ulong = 0x4000000;
+pub static V4L2_CAP_STREAMING: u32 = 0x4000000;
 //#define V4L2_CAP_DEVICE_CAPS 0x80000000 /* sets device capabilities field */
-pub static V4L2_CAP_DEVICE_CAPS: c_ulong = 0x80000000;
+pub static V4L2_CAP_DEVICE_CAPS: u32 = 0x80000000;
 //#define V4L2_PIX_FMT_RGB332 v4l2_fourcc('R', 'G', 'B', '1') /* 8 RGB-3-3-2 */
-pub static V4L2_PIX_FMT_RGB332: c_ulong = 0x31424752;
+pub static V4L2_PIX_FMT_RGB332: u32 = 0x31424752;
 //#define V4L2_PIX_FMT_RGB444 v4l2_fourcc('R', '4', '4', '4') /* 16 xxxxrrrr ggggbbbb */
-pub static V4L2_PIX_FMT_RGB444: c_ulong = 0x34343452;
+pub static V4L2_PIX_FMT_RGB444: u32 = 0x34343452;
 //#define V4L2_PIX_FMT_RGB555 v4l2_fourcc('R', 'G', 'B', 'O') /* 16 RGB-5-5-5 */
-pub static V4L2_PIX_FMT_RGB555: c_ulong = 0x4f424752;
+pub static V4L2_PIX_FMT_RGB555: u32 = 0x4f424752;
 //#define V4L2_PIX_FMT_RGB565 v4l2_fourcc('R', 'G', 'B', 'P') /* 16 RGB-5-6-5 */
-pub static V4L2_PIX_FMT_RGB565: c_ulong = 0x50424752;
+pub static V4L2_PIX_FMT_RGB565: u32 = 0x50424752;
 //#define V4L2_PIX_FMT_RGB555X v4l2_fourcc('R', 'G', 'B', 'Q') /* 16 RGB-5-5-5 BE */
-pub static V4L2_PIX_FMT_RGB555X: c_ulong = 0x51424752;
+pub static V4L2_PIX_FMT_RGB555X: u32 = 0x51424752;
 //#define V4L2_PIX_FMT_RGB565X v4l2_fourcc('R', 'G', 'B', 'R') /* 16 RGB-5-6-5 BE */
-pub static V4L2_PIX_FMT_RGB565X: c_ulong = 0x52424752;
+pub static V4L2_PIX_FMT_RGB565X: u32 = 0x52424752;
 //#define V4L2_PIX_FMT_BGR666 v4l2_fourcc('B', 'G', 'R', 'H') /* 18 BGR-6-6-6 */
-pub static V4L2_PIX_FMT_BGR666: c_ulong = 0x48524742;
+pub static V4L2_PIX_FMT_BGR666: u32 = 0x48524742;
 //#define V4L2_PIX_FMT_BGR24 v4l2_fourcc('B', 'G', 'R', '3') /* 24 BGR-8-8-8 */
-pub static V4L2_PIX_FMT_BGR24: c_ulong = 0x33524742;
+pub static V4L2_PIX_FMT_BGR24: u32 = 0x33524742;
 //#define V4L2_PIX_FMT_RGB24 v4l2_fourcc('R', 'G', 'B', '3') /* 24 RGB-8-8-8 */
-pub static V4L2_PIX_FMT_RGB24: c_ulong = 0x33424752;
+pub static V4L2_PIX_FMT_RGB24: u32 = 0x33424752;
 //#define V4L2_PIX_FMT_BGR32 v4l2_fourcc('B', 'G', 'R', '4') /* 32 BGR-8-8-8-8 */
-pub static V4L2_PIX_FMT_BGR32: c_ulong = 0x34524742;
+pub static V4L2_PIX_FMT_BGR32: u32 = 0x34524742;
 //#define V4L2_PIX_FMT_RGB32 v4l2_fourcc('R', 'G', 'B', '4') /* 32 RGB-8-8-8-8 */
-pub static V4L2_PIX_FMT_RGB32: c_ulong = 0x34424752;
+pub static V4L2_PIX_FMT_RGB32: u32 = 0x34424752;
 //#define V4L2_PIX_FMT_GREY v4l2_fourcc('G', 'R', 'E', 'Y') /* 8 Greyscale */
-pub static V4L2_PIX_FMT_GREY: c_ulong = 0x59455247;
+pub static V4L2_PIX_FMT_GREY: u32 = 0x59455247;
 //#define V4L2_PIX_FMT_Y4 v4l2_fourcc('Y', '0', '4', ' ') /* 4 Greyscale */
-pub static V4L2_PIX_FMT_Y4: c_ulong = 0x20343059;
+pub static V4L2_PIX_FMT_Y4: u32 = 0x20343059;
 //#define V4L2_PIX_FMT_Y6 v4l2_fourcc('Y', '0', '6', ' ') /* 6 Greyscale */
-pub static V4L2_PIX_FMT_Y6: c_ulong = 0x20363059;
+pub static V4L2_PIX_FMT_Y6: u32 = 0x20363059;
 //#define V4L2_PIX_FMT_Y10 v4l2_fourcc('Y', '1', '0', ' ') /* 10 Greyscale */
-pub static V4L2_PIX_FMT_Y10: c_ulong = 0x20303159;
+pub static V4L2_PIX_FMT_Y10: u32 = 0x20303159;
 //#define V4L2_PIX_FMT_Y12 v4l2_fourcc('Y', '1', '2', ' ') /* 12 Greyscale */
-pub static V4L2_PIX_FMT_Y12: c_ulong = 0x20323159;
+pub static V4L2_PIX_FMT_Y12: u32 = 0x20323159;
 //#define V4L2_PIX_FMT_Y16 v4l2_fourcc('Y', '1', '6', ' ') /* 16 Greyscale */
-pub static V4L2_PIX_FMT_Y16: c_ulong = 0x20363159;
+pub static V4L2_PIX_FMT_Y16: u32 = 0x20363159;
 //#define V4L2_PIX_FMT_Y10BPACK v4l2_fourcc('Y', '1', '0', 'B') /* 10 Greyscale bit-packed */
-pub static V4L2_PIX_FMT_Y10BPACK: c_ulong = 0x42303159;
+pub static V4L2_PIX_FMT_Y10BPACK: u32 = 0x42303159;
 //#define V4L2_PIX_FMT_PAL8 v4l2_fourcc('P', 'A', 'L', '8') /* 8 8-bit palette */
-pub static V4L2_PIX_FMT_PAL8: c_ulong = 0x384c4150;
+pub static V4L2_PIX_FMT_PAL8: u32 = 0x384c4150;
 //#define V4L2_PIX_FMT_YVU410 v4l2_fourcc('Y', 'V', 'U', '9') /* 9 YVU 4:1:0 */
-pub static V4L2_PIX_FMT_YVU410: c_ulong = 0x39555659;
+pub static V4L2_PIX_FMT_YVU410: u32 = 0x39555659;
 //#define V4L2_PIX_FMT_YVU420 v4l2_fourcc('Y', 'V', '1', '2') /* 12 YVU 4:2:0 */
-pub static V4L2_PIX_FMT_YVU420: c_ulong = 0x32315659;
+pub static V4L2_PIX_FMT_YVU420: u32 = 0x32315659;
 //#define V4L2_PIX_FMT_YUYV v4l2_fourcc('Y', 'U', 'Y', 'V') /* 16 YUV 4:2:2 */
-pub static V4L2_PIX_FMT_YUYV: c_ulong = 0x56595559;
+pub static V4L2_PIX_FMT_YUYV: u32 = 0x56595559;
 //#define V4L2_PIX_FMT_YYUV v4l2_fourcc('Y', 'Y', 'U', 'V') /* 16 YUV 4:2:2 */
-pub static V4L2_PIX_FMT_YYUV: c_ulong = 0x56555959;
+pub static V4L2_PIX_FMT_YYUV: u32 = 0x56555959;
 //#define V4L2_PIX_FMT_YVYU v4l2_fourcc('Y', 'V', 'Y', 'U') /* 16 YVU 4:2:2 */
-pub static V4L2_PIX_FMT_YVYU: c_ulong = 0x55595659;
+pub static V4L2_PIX_FMT_YVYU: u32 = 0x55595659;
 //#define V4L2_PIX_FMT_UYVY v4l2_fourcc('U', 'Y', 'V', 'Y') /* 16 YUV 4:2:2 */
-pub static V4L2_PIX_FMT_UYVY: c_ulong = 0x59565955;
+pub static V4L2_PIX_FMT_UYVY: u32 = 0x59565955;
 //#define V4L2_PIX_FMT_VYUY v4l2_fourcc('V', 'Y', 'U', 'Y') /* 16 YUV 4:2:2 */
-pub static V4L2_PIX_FMT_VYUY: c_ulong = 0x59555956;
+pub static V4L2_PIX_FMT_VYUY: u32 = 0x59555956;
 //#define V4L2_PIX_FMT_YUV422P v4l2_fourcc('4', '2', '2', 'P') /* 16 YVU422 planar */
-pub static V4L2_PIX_FMT_YUV422P: c_ulong = 0x50323234;
+pub static V4L2_PIX_FMT_YUV422P: u32 = 0x50323234;
 //#define V4L2_PIX_FMT_YUV411P v4l2_fourcc('4', '1', '1', 'P') /* 16 YVU411 planar */
-pub static V4L2_PIX_FMT_YUV411P: c_ulong = 0x50313134;
+pub static V4L2_PIX_FMT_YUV411P: u32 = 0x50313134;
 //#define V4L2_PIX_FMT_Y41P v4l2_fourcc('Y', '4', '1', 'P') /* 12 YUV 4:1:1 */
-pub static V4L2_PIX_FMT_Y41P: c_ulong = 0x50313459;
+pub static V4L2_PIX_FMT_Y41P: u32 = 0x50313459;
 //#define V4L2_PIX_FMT_YUV444 v4l2_fourcc('Y', '4', '4', '4') /* 16 xxxxyyyy uuuuvvvv */
-pub static V4L2_PIX_FMT_YUV444: c_ulong = 0x34343459;
+pub static V4L2_PIX_FMT_YUV444: u32 = 0x34343459;
 //#define V4L2_PIX_FMT_YUV555 v4l2_fourcc('Y', 'U', 'V', 'O') /* 16 YUV-5-5-5 */
-pub static V4L2_PIX_FMT_YUV555: c_ulong = 0x4f565559;
+pub static V4L2_PIX_FMT_YUV555: u32 = 0x4f565559;
 //#define V4L2_PIX_FMT_YUV565 v4l2_fourcc('Y', 'U', 'V', 'P') /* 16 YUV-5-6-5 */
-pub static V4L2_PIX_FMT_YUV565: c_ulong = 0x50565559;
+pub static V4L2_PIX_FMT_YUV565: u32 = 0x50565559;
 //#define V4L2_PIX_FMT_YUV32 v4l2_fourcc('Y', 'U', 'V', '4') /* 32 YUV-8-8-8-8 */
-pub static V4L2_PIX_FMT_YUV32: c_ulong = 0x34565559;
+pub static V4L2_PIX_FMT_YUV32: u32 = 0x34565559;
 //#define V4L2_PIX_FMT_YUV410 v4l2_fourcc('Y', 'U', 'V', '9') /* 9 YUV 4:1:0 */
-pub static V4L2_PIX_FMT_YUV410: c_ulong = 0x39565559;
+pub static V4L2_PIX_FMT_YUV410: u32 = 0x39565559;
 //#define V4L2_PIX_FMT_YUV420 v4l2_fourcc('Y', 'U', '1', '2') /* 12 YUV 4:2:0 */
-pub static V4L2_PIX_FMT_YUV420: c_ulong = 0x32315559;
+pub static V4L2_PIX_FMT_YUV420: u32 = 0x32315559;
 //#define V4L2_PIX_FMT_HI240 v4l2_fourcc('H', 'I', '2', '4') /* 8 8-bit color */
-pub static V4L2_PIX_FMT_HI240: c_ulong = 0x34324948;
+pub static V4L2_PIX_FMT_HI240: u32 = 0x34324948;
 //#define V4L2_PIX_FMT_HM12 v4l2_fourcc('H', 'M', '1', '2') /* 8 YUV 4:2:0 16x16 macroblocks */
-pub static V4L2_PIX_FMT_HM12: c_ulong = 0x32314d48;
+pub static V4L2_PIX_FMT_HM12: u32 = 0x32314d48;
 //#define V4L2_PIX_FMT_M420 v4l2_fourcc('M', '4', '2', '0') /* 12 YUV 4:2:0 2 lines y, 1 line uv interleaved */
-pub static V4L2_PIX_FMT_M420: c_ulong = 0x3032344d;
+pub static V4L2_PIX_FMT_M420: u32 = 0x3032344d;
 //#define V4L2_PIX_FMT_NV12 v4l2_fourcc('N', 'V', '1', '2') /* 12 Y/CbCr 4:2:0 */
-pub static V4L2_PIX_FMT_NV12: c_ulong = 0x3231564e;
+pub static V4L2_PIX_FMT_NV12: u32 = 0x3231564e;
 //#define V4L2_PIX_FMT_NV21 v4l2_fourcc('N', 'V', '2', '1') /* 12 Y/CrCb 4:2:0 */
-pub static V4L2_PIX_FMT_NV21: c_ulong = 0x3132564e;
+pub static V4L2_PIX_FMT_NV21: u32 = 0x3132564e;
 //#define V4L2_PIX_FMT_NV16 v4l2_fourcc('N', 'V', '1', '6') /* 16 Y/CbCr 4:2:2 */
-pub static V4L2_PIX_FMT_NV16: c_ulong = 0x3631564e;
+pub static V4L2_PIX_FMT_NV16: u32 = 0x3631564e;
 //#define V4L2_PIX_FMT_NV61 v4l2_fourcc('N', 'V', '6', '1') /* 16 Y/CrCb 4:2:2 */
-pub static V4L2_PIX_FMT_NV61: c_ulong = 0x3136564e;
+pub static V4L2_PIX_FMT_NV61: u32 = 0x3136564e;
 //#define V4L2_PIX_FMT_NV24 v4l2_fourcc('N', 'V', '2', '4') /* 24 Y/CbCr 4:4:4 */
-pub static V4L2_PIX_FMT_NV24: c_ulong = 0x3432564e;
+pub static V4L2_PIX_FMT_NV24: u32 = 0x3432564e;
 //#define V4L2_PIX_FMT_NV42 v4l2_fourcc('N', 'V', '4', '2') /* 24 Y/CrCb 4:4:4 */
-pub static V4L2_PIX_FMT_NV42: c_ulong = 0x3234564e;
+pub static V4L2_PIX_FMT_NV42: u32 = 0x3234564e;
 //#define V4L2_PIX_FMT_NV12M v4l2_fourcc('N', 'M', '1', '2') /* 12 Y/CbCr 4:2:0 */
-pub static V4L2_PIX_FMT_NV12M: c_ulong = 0x32314d4e;
+pub static V4L2_PIX_FMT_NV12M: u32 = 0x32314d4e;
 //#define V4L2_PIX_FMT_NV21M v4l2_fourcc('N', 'M', '2', '1') /* 21 Y/CrCb 4:2:0 */
-pub static V4L2_PIX_FMT_NV21M: c_ulong = 0x31324d4e;
+pub static V4L2_PIX_FMT_NV21M: u32 = 0x31324d4e;
 //#define V4L2_PIX_FMT_NV12MT v4l2_fourcc('T', 'M', '1', '2') /* 12 Y/CbCr 4:2:0 64x32 macroblocks */
-pub static V4L2_PIX_FMT_NV12MT: c_ulong = 0x32314d54;
+pub static V4L2_PIX_FMT_NV12MT: u32 = 0x32314d54;
 //#define V4L2_PIX_FMT_NV12MT_16X16 v4l2_fourcc('V', 'M', '1', '2') /* 12 Y/CbCr 4:2:0 16x16 macroblocks */
-pub static V4L2_PIX_FMT_NV12MT_16X16: c_ulong = 0x32314d56;
+pub static V4L2_PIX_FMT_NV12MT_16X16: u32 = 0x32314d56;
 //#define V4L2_PIX_FMT_YUV420M v4l2_fourcc('Y', 'M', '1', '2') /* 12 YUV420 planar */
-pub static V4L2_PIX_FMT_YUV420M: c_ulong = 0x32314d59;
+pub static V4L2_PIX_FMT_YUV420M: u32 = 0x32314d59;
 //#define V4L2_PIX_FMT_YVU420M v4l2_fourcc('Y', 'M', '2', '1') /* 12 YVU420 planar */
-pub static V4L2_PIX_FMT_YVU420M: c_ulong = 0x31324d59;
+pub static V4L2_PIX_FMT_YVU420M: u32 = 0x31324d59;
 //#define V4L2_PIX_FMT_SBGGR8 v4l2_fourcc('B', 'A', '8', '1') /* 8 BGBG.. GRGR.. */
-pub static V4L2_PIX_FMT_SBGGR8: c_ulong = 0x31384142;
+pub static V4L2_PIX_FMT_SBGGR8: u32 = 0x31384142;
 //#define V4L2_PIX_FMT_SGBRG8 v4l2_fourcc('G', 'B', 'R', 'G') /* 8 GBGB.. RGRG.. */
-pub static V4L2_PIX_FMT_SGBRG8: c_ulong = 0x47524247;
+pub static V4L2_PIX_FMT_SGBRG8: u32 = 0x47524247;
 //#define V4L2_PIX_FMT_SGRBG8 v4l2_fourcc('G', 'R', 'B', 'G') /* 8 GRGR.. BGBG.. */
-pub static V4L2_PIX_FMT_SGRBG8: c_ulong = 0x47425247;
+pub static V4L2_PIX_FMT_SGRBG8: u32 = 0x47425247;
 //#define V4L2_PIX_FMT_SRGGB8 v4l2_fourcc('R', 'G', 'G', 'B') /* 8 RGRG.. GBGB.. */
-pub static V4L2_PIX_FMT_SRGGB8: c_ulong = 0x42474752;
+pub static V4L2_PIX_FMT_SRGGB8: u32 = 0x42474752;
 //#define V4L2_PIX_FMT_SBGGR10 v4l2_fourcc('B', 'G', '1', '0') /* 10 BGBG.. GRGR.. */
-pub static V4L2_PIX_FMT_SBGGR10: c_ulong = 0x30314742;
+pub static V4L2_PIX_FMT_SBGGR10: u32 = 0x30314742;
 //#define V4L2_PIX_FMT_SGBRG10 v4l2_fourcc('G', 'B', '1', '0') /* 10 GBGB.. RGRG.. */
-pub static V4L2_PIX_FMT_SGBRG10: c_ulong = 0x30314247;
+pub static V4L2_PIX_FMT_SGBRG10: u32 = 0x30314247;
 //#define V4L2_PIX_FMT_SGRBG10 v4l2_fourcc('B', 'A', '1', '0') /* 10 GRGR.. BGBG.. */
-pub static V4L2_PIX_FMT_SGRBG10: c_ulong = 0x30314142;
+pub static V4L2_PIX_FMT_SGRBG10: u32 = 0x30314142;
 //#define V4L2_PIX_FMT_SRGGB10 v4l2_fourcc('R', 'G', '1', '0') /* 10 RGRG.. GBGB.. */
-pub static V4L2_PIX_FMT_SRGGB10: c_ulong = 0x30314752;
+pub static V4L2_PIX_FMT_SRGGB10: u32 = 0x30314752;
 //#define V4L2_PIX_FMT_SBGGR12 v4l2_fourcc('B', 'G', '1', '2') /* 12 BGBG.. GRGR.. */
-pub static V4L2_PIX_FMT_SBGGR12: c_ulong = 0x32314742;
+pub static V4L2_PIX_FMT_SBGGR12: u32 = 0x32314742;
 //#define V4L2_PIX_FMT_SGBRG12 v4l2_fourcc('G', 'B', '1', '2') /* 12 GBGB.. RGRG.. */
-pub static V4L2_PIX_FMT_SGBRG12: c_ulong = 0x32314247;
+pub static V4L2_PIX_FMT_SGBRG12: u32 = 0x32314247;
 //#define V4L2_PIX_FMT_SGRBG12 v4l2_fourcc('B', 'A', '1', '2') /* 12 GRGR.. BGBG.. */
-pub static V4L2_PIX_FMT_SGRBG12: c_ulong = 0x32314142;
+pub static V4L2_PIX_FMT_SGRBG12: u32 = 0x32314142;
 //#define V4L2_PIX_FMT_SRGGB12 v4l2_fourcc('R', 'G', '1', '2') /* 12 RGRG.. GBGB.. */
-pub static V4L2_PIX_FMT_SRGGB12: c_ulong = 0x32314752;
+pub static V4L2_PIX_FMT_SRGGB12: u32 = 0x32314752;
 //#define V4L2_PIX_FMT_SBGGR10DPCM8 v4l2_fourcc('b', 'B', 'A', '8')
-pub static V4L2_PIX_FMT_SBGGR10DPCM8: c_ulong = 0x38414262;
+pub static V4L2_PIX_FMT_SBGGR10DPCM8: u32 = 0x38414262;
 //#define V4L2_PIX_FMT_SGBRG10DPCM8 v4l2_fourcc('b', 'G', 'A', '8')
-pub static V4L2_PIX_FMT_SGBRG10DPCM8: c_ulong = 0x38414762;
+pub static V4L2_PIX_FMT_SGBRG10DPCM8: u32 = 0x38414762;
 //#define V4L2_PIX_FMT_SGRBG10DPCM8 v4l2_fourcc('B', 'D', '1', '0')
-pub static V4L2_PIX_FMT_SGRBG10DPCM8: c_ulong = 0x30314442;
+pub static V4L2_PIX_FMT_SGRBG10DPCM8: u32 = 0x30314442;
 //#define V4L2_PIX_FMT_SRGGB10DPCM8 v4l2_fourcc('b', 'R', 'A', '8')
-pub static V4L2_PIX_FMT_SRGGB10DPCM8: c_ulong = 0x38415262;
+pub static V4L2_PIX_FMT_SRGGB10DPCM8: u32 = 0x38415262;
 //#define V4L2_PIX_FMT_SBGGR16 v4l2_fourcc('B', 'Y', 'R', '2') /* 16 BGBG.. GRGR.. */
-pub static V4L2_PIX_FMT_SBGGR16: c_ulong = 0x32525942;
+pub static V4L2_PIX_FMT_SBGGR16: u32 = 0x32525942;
 //#define V4L2_PIX_FMT_MJPEG v4l2_fourcc('M', 'J', 'P', 'G') /* Motion-JPEG */
-pub static V4L2_PIX_FMT_MJPEG: c_ulong = 0x47504a4d;
+pub static V4L2_PIX_FMT_MJPEG: u32 = 0x47504a4d;
 //#define V4L2_PIX_FMT_JPEG v4l2_fourcc('J', 'P', 'E', 'G') /* JFIF JPEG */
-pub static V4L2_PIX_FMT_JPEG: c_ulong = 0x4745504a;
+pub static V4L2_PIX_FMT_JPEG: u32 = 0x4745504a;
 //#define V4L2_PIX_FMT_DV v4l2_fourcc('d', 'v', 's', 'd') /* 1394 */
-pub static V4L2_PIX_FMT_DV: c_ulong = 0x64737664;
+pub static V4L2_PIX_FMT_DV: u32 = 0x64737664;
 //#define V4L2_PIX_FMT_MPEG v4l2_fourcc('M', 'P', 'E', 'G') /* MPEG-1/2/4 Multiplexed */
-pub static V4L2_PIX_FMT_MPEG: c_ulong = 0x4745504d;
+pub static V4L2_PIX_FMT_MPEG: u32 = 0x4745504d;
 //#define V4L2_PIX_FMT_H264 v4l2_fourcc('H', '2', '6', '4') /* H264 with start codes */
-pub static V4L2_PIX_FMT_H264: c_ulong = 0x34363248;
+pub static V4L2_PIX_FMT_H264: u32 = 0x34363248;
 //#define V4L2_PIX_FMT_H264_NO_SC v4l2_fourcc('A', 'V', 'C', '1') /* H264 without start codes */
-pub static V4L2_PIX_FMT_H264_NO_SC: c_ulong = 0x31435641;
+pub static V4L2_PIX_FMT_H264_NO_SC: u32 = 0x31435641;
 //#define V4L2_PIX_FMT_H264_MVC v4l2_fourcc('M', '2', '6', '4') /* H264 MVC */
-pub static V4L2_PIX_FMT_H264_MVC: c_ulong = 0x3436324d;
+pub static V4L2_PIX_FMT_H264_MVC: u32 = 0x3436324d;
 //#define V4L2_PIX_FMT_H263 v4l2_fourcc('H', '2', '6', '3') /* H263 */
-pub static V4L2_PIX_FMT_H263: c_ulong = 0x33363248;
+pub static V4L2_PIX_FMT_H263: u32 = 0x33363248;
 //#define V4L2_PIX_FMT_MPEG1 v4l2_fourcc('M', 'P', 'G', '1') /* MPEG-1 ES */
-pub static V4L2_PIX_FMT_MPEG1: c_ulong = 0x3147504d;
+pub static V4L2_PIX_FMT_MPEG1: u32 = 0x3147504d;
 //#define V4L2_PIX_FMT_MPEG2 v4l2_fourcc('M', 'P', 'G', '2') /* MPEG-2 ES */
-pub static V4L2_PIX_FMT_MPEG2: c_ulong = 0x3247504d;
+pub static V4L2_PIX_FMT_MPEG2: u32 = 0x3247504d;
 //#define V4L2_PIX_FMT_MPEG4 v4l2_fourcc('M', 'P', 'G', '4') /* MPEG-4 ES */
-pub static V4L2_PIX_FMT_MPEG4: c_ulong = 0x3447504d;
+pub static V4L2_PIX_FMT_MPEG4: u32 = 0x3447504d;
 //#define V4L2_PIX_FMT_XVID v4l2_fourcc('X', 'V', 'I', 'D') /* Xvid */
-pub static V4L2_PIX_FMT_XVID: c_ulong = 0x44495658;
+pub static V4L2_PIX_FMT_XVID: u32 = 0x44495658;
 //#define V4L2_PIX_FMT_VC1_ANNEX_G v4l2_fourcc('V', 'C', '1', 'G') /* SMPTE 421M Annex G compliant stream */
-pub static V4L2_PIX_FMT_VC1_ANNEX_G: c_ulong = 0x47314356;
+pub static V4L2_PIX_FMT_VC1_ANNEX_G: u32 = 0x47314356;
 //#define V4L2_PIX_FMT_VC1_ANNEX_L v4l2_fourcc('V', 'C', '1', 'L') /* SMPTE 421M Annex L compliant stream */
-pub static V4L2_PIX_FMT_VC1_ANNEX_L: c_ulong = 0x4c314356;
+pub static V4L2_PIX_FMT_VC1_ANNEX_L: u32 = 0x4c314356;
 //#define V4L2_PIX_FMT_VP8 v4l2_fourcc('V', 'P', '8', '0') /* VP8 */
-pub static V4L2_PIX_FMT_VP8: c_ulong = 0x30385056;
+pub static V4L2_PIX_FMT_VP8: u32 = 0x30385056;
 //#define V4L2_PIX_FMT_CPIA1 v4l2_fourcc('C', 'P', 'I', 'A') /* cpia1 YUV */
-pub static V4L2_PIX_FMT_CPIA1: c_ulong = 0x41495043;
+pub static V4L2_PIX_FMT_CPIA1: u32 = 0x41495043;
 //#define V4L2_PIX_FMT_WNVA v4l2_fourcc('W', 'N', 'V', 'A') /* Winnov hw compress */
-pub static V4L2_PIX_FMT_WNVA: c_ulong = 0x41564e57;
+pub static V4L2_PIX_FMT_WNVA: u32 = 0x41564e57;
 //#define V4L2_PIX_FMT_SN9C10X v4l2_fourcc('S', '9', '1', '0') /* SN9C10x compression */
-pub static V4L2_PIX_FMT_SN9C10X: c_ulong = 0x30313953;
+pub static V4L2_PIX_FMT_SN9C10X: u32 = 0x30313953;
 //#define V4L2_PIX_FMT_SN9C20X_I420 v4l2_fourcc('S', '9', '2', '0') /* SN9C20x YUV 4:2:0 */
-pub static V4L2_PIX_FMT_SN9C20X_I420: c_ulong = 0x30323953;
+pub static V4L2_PIX_FMT_SN9C20X_I420: u32 = 0x30323953;
 //#define V4L2_PIX_FMT_PWC1 v4l2_fourcc('P', 'W', 'C', '1') /* pwc older webcam */
-pub static V4L2_PIX_FMT_PWC1: c_ulong = 0x31435750;
+pub static V4L2_PIX_FMT_PWC1: u32 = 0x31435750;
 //#define V4L2_PIX_FMT_PWC2 v4l2_fourcc('P', 'W', 'C', '2') /* pwc newer webcam */
-pub static V4L2_PIX_FMT_PWC2: c_ulong = 0x32435750;
+pub static V4L2_PIX_FMT_PWC2: u32 = 0x32435750;
 //#define V4L2_PIX_FMT_ET61X251 v4l2_fourcc('E', '6', '2', '5') /* ET61X251 compression */
-pub static V4L2_PIX_FMT_ET61X251: c_ulong = 0x35323645;
+pub static V4L2_PIX_FMT_ET61X251: u32 = 0x35323645;
 //#define V4L2_PIX_FMT_SPCA501 v4l2_fourcc('S', '5', '0', '1') /* YUYV per line */
-pub static V4L2_PIX_FMT_SPCA501: c_ulong = 0x31303553;
+pub static V4L2_PIX_FMT_SPCA501: u32 = 0x31303553;
 //#define V4L2_PIX_FMT_SPCA505 v4l2_fourcc('S', '5', '0', '5') /* YYUV per line */
-pub static V4L2_PIX_FMT_SPCA505: c_ulong = 0x35303553;
+pub static V4L2_PIX_FMT_SPCA505: u32 = 0x35303553;
 //#define V4L2_PIX_FMT_SPCA508 v4l2_fourcc('S', '5', '0', '8') /* YUVY per line */
-pub static V4L2_PIX_FMT_SPCA508: c_ulong = 0x38303553;
+pub static V4L2_PIX_FMT_SPCA508: u32 = 0x38303553;
 //#define V4L2_PIX_FMT_SPCA561 v4l2_fourcc('S', '5', '6', '1') /* compressed GBRG bayer */
-pub static V4L2_PIX_FMT_SPCA561: c_ulong = 0x31363553;
+pub static V4L2_PIX_FMT_SPCA561: u32 = 0x31363553;
 //#define V4L2_PIX_FMT_PAC207 v4l2_fourcc('P', '2', '0', '7') /* compressed BGGR bayer */
-pub static V4L2_PIX_FMT_PAC207: c_ulong = 0x37303250;
+pub static V4L2_PIX_FMT_PAC207: u32 = 0x37303250;
 //#define V4L2_PIX_FMT_MR97310A v4l2_fourcc('M', '3', '1', '0') /* compressed BGGR bayer */
-pub static V4L2_PIX_FMT_MR97310A: c_ulong = 0x3031334d;
+pub static V4L2_PIX_FMT_MR97310A: u32 = 0x3031334d;
 //#define V4L2_PIX_FMT_JL2005BCD v4l2_fourcc('J', 'L', '2', '0') /* compressed RGGB bayer */
-pub static V4L2_PIX_FMT_JL2005BCD: c_ulong = 0x30324c4a;
+pub static V4L2_PIX_FMT_JL2005BCD: u32 = 0x30324c4a;
 //#define V4L2_PIX_FMT_SN9C2028 v4l2_fourcc('S', 'O', 'N', 'X') /* compressed GBRG bayer */
-pub static V4L2_PIX_FMT_SN9C2028: c_ulong = 0x584e4f53;
+pub static V4L2_PIX_FMT_SN9C2028: u32 = 0x584e4f53;
 //#define V4L2_PIX_FMT_SQ905C v4l2_fourcc('9', '0', '5', 'C') /* compressed RGGB bayer */
-pub static V4L2_PIX_FMT_SQ905C: c_ulong = 0x43353039;
+pub static V4L2_PIX_FMT_SQ905C: u32 = 0x43353039;
 //#define V4L2_PIX_FMT_PJPG v4l2_fourcc('P', 'J', 'P', 'G') /* Pixart 73xx JPEG */
-pub static V4L2_PIX_FMT_PJPG: c_ulong = 0x47504a50;
+pub static V4L2_PIX_FMT_PJPG: u32 = 0x47504a50;
 //#define V4L2_PIX_FMT_OV511 v4l2_fourcc('O', '5', '1', '1') /* ov511 JPEG */
-pub static V4L2_PIX_FMT_OV511: c_ulong = 0x3131354f;
+pub static V4L2_PIX_FMT_OV511: u32 = 0x3131354f;
 //#define V4L2_PIX_FMT_OV518 v4l2_fourcc('O', '5', '1', '8') /* ov518 JPEG */
-pub static V4L2_PIX_FMT_OV518: c_ulong = 0x3831354f;
+pub static V4L2_PIX_FMT_OV518: u32 = 0x3831354f;
 //#define V4L2_PIX_FMT_STV0680 v4l2_fourcc('S', '6', '8', '0') /* stv0680 bayer */
-pub static V4L2_PIX_FMT_STV0680: c_ulong = 0x30383653;
+pub static V4L2_PIX_FMT_STV0680: u32 = 0x30383653;
 //#define V4L2_PIX_FMT_TM6000 v4l2_fourcc('T', 'M', '6', '0') /* tm5600/tm60x0 */
-pub static V4L2_PIX_FMT_TM6000: c_ulong = 0x30364d54;
+pub static V4L2_PIX_FMT_TM6000: u32 = 0x30364d54;
 //#define V4L2_PIX_FMT_CIT_YYVYUY v4l2_fourcc('C', 'I', 'T', 'V') /* one line of Y then 1 line of VYUY */
-pub static V4L2_PIX_FMT_CIT_YYVYUY: c_ulong = 0x56544943;
+pub static V4L2_PIX_FMT_CIT_YYVYUY: u32 = 0x56544943;
 //#define V4L2_PIX_FMT_KONICA420 v4l2_fourcc('K', 'O', 'N', 'I') /* YUV420 planar in blocks of 256 pixels */
-pub static V4L2_PIX_FMT_KONICA420: c_ulong = 0x494e4f4b;
+pub static V4L2_PIX_FMT_KONICA420: u32 = 0x494e4f4b;
 //#define V4L2_PIX_FMT_JPGL v4l2_fourcc('J', 'P', 'G', 'L') /* JPEG-Lite */
-pub static V4L2_PIX_FMT_JPGL: c_ulong = 0x4c47504a;
+pub static V4L2_PIX_FMT_JPGL: u32 = 0x4c47504a;
 //#define V4L2_PIX_FMT_SE401 v4l2_fourcc('S', '4', '0', '1') /* se401 janggu compressed rgb */
-pub static V4L2_PIX_FMT_SE401: c_ulong = 0x31303453;
+pub static V4L2_PIX_FMT_SE401: u32 = 0x31303453;
 //#define V4L2_PIX_FMT_S5C_UYVY_JPG v4l2_fourcc('S', '5', 'C', 'I') /* S5C73M3 interleaved UYVY/JPEG */
-pub static V4L2_PIX_FMT_S5C_UYVY_JPG: c_ulong = 0x49433553;
+pub static V4L2_PIX_FMT_S5C_UYVY_JPG: u32 = 0x49433553;
 //#define V4L2_FMT_FLAG_COMPRESSED 0x0001
-pub static V4L2_FMT_FLAG_COMPRESSED: c_ulong = 0x1;
+pub static V4L2_FMT_FLAG_COMPRESSED: u32 = 0x1;
 //#define V4L2_FMT_FLAG_EMULATED 0x0002
-pub static V4L2_FMT_FLAG_EMULATED: c_ulong = 0x2;
+pub static V4L2_FMT_FLAG_EMULATED: u32 = 0x2;
 //#define V4L2_TC_TYPE_24FPS 1
-pub static V4L2_TC_TYPE_24FPS: c_ulong = 0x1;
+pub static V4L2_TC_TYPE_24FPS: u32 = 0x1;
 //#define V4L2_TC_TYPE_25FPS 2
-pub static V4L2_TC_TYPE_25FPS: c_ulong = 0x2;
+pub static V4L2_TC_TYPE_25FPS: u32 = 0x2;
 //#define V4L2_TC_TYPE_30FPS 3
-pub static V4L2_TC_TYPE_30FPS: c_ulong = 0x3;
+pub static V4L2_TC_TYPE_30FPS: u32 = 0x3;
 //#define V4L2_TC_TYPE_50FPS 4
-pub static V4L2_TC_TYPE_50FPS: c_ulong = 0x4;
+pub static V4L2_TC_TYPE_50FPS: u32 = 0x4;
 //#define V4L2_TC_TYPE_60FPS 5
-pub static V4L2_TC_TYPE_60FPS: c_ulong = 0x5;
+pub static V4L2_TC_TYPE_60FPS: u32 = 0x5;
 //#define V4L2_TC_FLAG_DROPFRAME 0x0001 /* "drop-frame" mode */
-pub static V4L2_TC_FLAG_DROPFRAME: c_ulong = 0x1;
+pub static V4L2_TC_FLAG_DROPFRAME: u32 = 0x1;
 //#define V4L2_TC_FLAG_COLORFRAME 0x0002
-pub static V4L2_TC_FLAG_COLORFRAME: c_ulong = 0x2;
+pub static V4L2_TC_FLAG_COLORFRAME: u32 = 0x2;
 //#define V4L2_TC_USERBITS_field 0x000C
-pub static V4L2_TC_USERBITS_field: c_ulong = 0xc;
+pub static V4L2_TC_USERBITS_field: u32 = 0xc;
 //#define V4L2_TC_USERBITS_USERDEFINED 0x0000
-pub static V4L2_TC_USERBITS_USERDEFINED: c_ulong = 0x0;
+pub static V4L2_TC_USERBITS_USERDEFINED: u32 = 0x0;
 //#define V4L2_TC_USERBITS_8BITCHARS 0x0008
-pub static V4L2_TC_USERBITS_8BITCHARS: c_ulong = 0x8;
+pub static V4L2_TC_USERBITS_8BITCHARS: u32 = 0x8;
 //#define V4L2_JPEG_MARKER_DHT (1<<3) /* Define Huffman Tables */
-pub static V4L2_JPEG_MARKER_DHT: c_ulong = 0x8;
+pub static V4L2_JPEG_MARKER_DHT: u32 = 0x8;
 //#define V4L2_JPEG_MARKER_DQT (1<<4) /* Define Quantization Tables */
-pub static V4L2_JPEG_MARKER_DQT: c_ulong = 0x10;
+pub static V4L2_JPEG_MARKER_DQT: u32 = 0x10;
 //#define V4L2_JPEG_MARKER_DRI (1<<5) /* Define Restart Interval */
-pub static V4L2_JPEG_MARKER_DRI: c_ulong = 0x20;
+pub static V4L2_JPEG_MARKER_DRI: u32 = 0x20;
 //#define V4L2_JPEG_MARKER_COM (1<<6) /* Comment segment */
-pub static V4L2_JPEG_MARKER_COM: c_ulong = 0x40;
+pub static V4L2_JPEG_MARKER_COM: u32 = 0x40;
 //#define V4L2_JPEG_MARKER_APP (1<<7) /* App segment, driver will
-pub static V4L2_JPEG_MARKER_APP: c_ulong = 0x80;
+pub static V4L2_JPEG_MARKER_APP: u32 = 0x80;
 //#define V4L2_BUF_FLAG_MAPPED 0x0001 /* Buffer is mapped (flag) */
-pub static V4L2_BUF_FLAG_MAPPED: c_ulong = 0x1;
+pub static V4L2_BUF_FLAG_MAPPED: u32 = 0x1;
 //#define V4L2_BUF_FLAG_QUEUED 0x0002 /* Buffer is queued for processing */
-pub static V4L2_BUF_FLAG_QUEUED: c_ulong = 0x2;
+pub static V4L2_BUF_FLAG_QUEUED: u32 = 0x2;
 //#define V4L2_BUF_FLAG_DONE 0x0004 /* Buffer is ready */
-pub static V4L2_BUF_FLAG_DONE: c_ulong = 0x4;
+pub static V4L2_BUF_FLAG_DONE: u32 = 0x4;
 //#define V4L2_BUF_FLAG_KEYFRAME 0x0008 /* Image is a keyframe (I-frame) */
-pub static V4L2_BUF_FLAG_KEYFRAME: c_ulong = 0x8;
+pub static V4L2_BUF_FLAG_KEYFRAME: u32 = 0x8;
 //#define V4L2_BUF_FLAG_PFRAME 0x0010 /* Image is a P-frame */
-pub static V4L2_BUF_FLAG_PFRAME: c_ulong = 0x10;
+pub static V4L2_BUF_FLAG_PFRAME: u32 = 0x10;
 //#define V4L2_BUF_FLAG_BFRAME 0x0020 /* Image is a B-frame */
-pub static V4L2_BUF_FLAG_BFRAME: c_ulong = 0x20;
+pub static V4L2_BUF_FLAG_BFRAME: u32 = 0x20;
 //#define V4L2_BUF_FLAG_ERROR 0x0040
-pub static V4L2_BUF_FLAG_ERROR: c_ulong = 0x40;
+pub static V4L2_BUF_FLAG_ERROR: u32 = 0x40;
 //#define V4L2_BUF_FLAG_TIMECODE 0x0100 /* timecode field is valid */
-pub static V4L2_BUF_FLAG_TIMECODE: c_ulong = 0x100;
+pub static V4L2_BUF_FLAG_TIMECODE: u32 = 0x100;
 //#define V4L2_BUF_FLAG_PREPARED 0x0400 /* Buffer is prepared for queuing */
-pub static V4L2_BUF_FLAG_PREPARED: c_ulong = 0x400;
+pub static V4L2_BUF_FLAG_PREPARED: u32 = 0x400;
 //#define V4L2_BUF_FLAG_NO_CACHE_INVALIDATE 0x0800
-pub static V4L2_BUF_FLAG_NO_CACHE_INVALIDATE: c_ulong = 0x800;
+pub static V4L2_BUF_FLAG_NO_CACHE_INVALIDATE: u32 = 0x800;
 //#define V4L2_BUF_FLAG_NO_CACHE_CLEAN 0x1000
-pub static V4L2_BUF_FLAG_NO_CACHE_CLEAN: c_ulong = 0x1000;
+pub static V4L2_BUF_FLAG_NO_CACHE_CLEAN: u32 = 0x1000;
 //#define V4L2_FBUF_CAP_EXTERNOVERLAY 0x0001
-pub static V4L2_FBUF_CAP_EXTERNOVERLAY: c_ulong = 0x1;
+pub static V4L2_FBUF_CAP_EXTERNOVERLAY: u32 = 0x1;
 //#define V4L2_FBUF_CAP_CHROMAKEY 0x0002
-pub static V4L2_FBUF_CAP_CHROMAKEY: c_ulong = 0x2;
+pub static V4L2_FBUF_CAP_CHROMAKEY: u32 = 0x2;
 //#define V4L2_FBUF_CAP_LIST_CLIPPING 0x0004
-pub static V4L2_FBUF_CAP_LIST_CLIPPING: c_ulong = 0x4;
+pub static V4L2_FBUF_CAP_LIST_CLIPPING: u32 = 0x4;
 //#define V4L2_FBUF_CAP_BITMAP_CLIPPING 0x0008
-pub static V4L2_FBUF_CAP_BITMAP_CLIPPING: c_ulong = 0x8;
+pub static V4L2_FBUF_CAP_BITMAP_CLIPPING: u32 = 0x8;
 //#define V4L2_FBUF_CAP_LOCAL_ALPHA 0x0010
-pub static V4L2_FBUF_CAP_LOCAL_ALPHA: c_ulong = 0x10;
+pub static V4L2_FBUF_CAP_LOCAL_ALPHA: u32 = 0x10;
 //#define V4L2_FBUF_CAP_GLOBAL_ALPHA 0x0020
-pub static V4L2_FBUF_CAP_GLOBAL_ALPHA: c_ulong = 0x20;
+pub static V4L2_FBUF_CAP_GLOBAL_ALPHA: u32 = 0x20;
 //#define V4L2_FBUF_CAP_LOCAL_INV_ALPHA 0x0040
-pub static V4L2_FBUF_CAP_LOCAL_INV_ALPHA: c_ulong = 0x40;
+pub static V4L2_FBUF_CAP_LOCAL_INV_ALPHA: u32 = 0x40;
 //#define V4L2_FBUF_CAP_SRC_CHROMAKEY 0x0080
-pub static V4L2_FBUF_CAP_SRC_CHROMAKEY: c_ulong = 0x80;
+pub static V4L2_FBUF_CAP_SRC_CHROMAKEY: u32 = 0x80;
 //#define V4L2_FBUF_FLAG_PRIMARY 0x0001
-pub static V4L2_FBUF_FLAG_PRIMARY: c_ulong = 0x1;
+pub static V4L2_FBUF_FLAG_PRIMARY: u32 = 0x1;
 //#define V4L2_FBUF_FLAG_OVERLAY 0x0002
-pub static V4L2_FBUF_FLAG_OVERLAY: c_ulong = 0x2;
+pub static V4L2_FBUF_FLAG_OVERLAY: u32 = 0x2;
 //#define V4L2_FBUF_FLAG_CHROMAKEY 0x0004
-pub static V4L2_FBUF_FLAG_CHROMAKEY: c_ulong = 0x4;
+pub static V4L2_FBUF_FLAG_CHROMAKEY: u32 = 0x4;
 //#define V4L2_FBUF_FLAG_LOCAL_ALPHA 0x0008
-pub static V4L2_FBUF_FLAG_LOCAL_ALPHA: c_ulong = 0x8;
+pub static V4L2_FBUF_FLAG_LOCAL_ALPHA: u32 = 0x8;
 //#define V4L2_FBUF_FLAG_GLOBAL_ALPHA 0x0010
-pub static V4L2_FBUF_FLAG_GLOBAL_ALPHA: c_ulong = 0x10;
+pub static V4L2_FBUF_FLAG_GLOBAL_ALPHA: u32 = 0x10;
 //#define V4L2_FBUF_FLAG_LOCAL_INV_ALPHA 0x0020
-pub static V4L2_FBUF_FLAG_LOCAL_INV_ALPHA: c_ulong = 0x20;
+pub static V4L2_FBUF_FLAG_LOCAL_INV_ALPHA: u32 = 0x20;
 //#define V4L2_FBUF_FLAG_SRC_CHROMAKEY 0x0040
-pub static V4L2_FBUF_FLAG_SRC_CHROMAKEY: c_ulong = 0x40;
+pub static V4L2_FBUF_FLAG_SRC_CHROMAKEY: u32 = 0x40;
 //#define V4L2_MODE_HIGHQUALITY 0x0001 /* High quality imaging mode */
-pub static V4L2_MODE_HIGHQUALITY: c_ulong = 0x1;
+pub static V4L2_MODE_HIGHQUALITY: u32 = 0x1;
 //#define V4L2_CAP_TIMEPERFRAME 0x1000 /* timeperframe field is supported */
-pub static V4L2_CAP_TIMEPERFRAME: c_ulong = 0x1000;
+pub static V4L2_CAP_TIMEPERFRAME: u32 = 0x1000;
 //#define V4L2_STD_PAL_B ((v4l2_std_id)0x00000001)
-pub static V4L2_STD_PAL_B: c_ulong = 0x1;
+pub static V4L2_STD_PAL_B: u32 = 0x1;
 //#define V4L2_STD_PAL_B1 ((v4l2_std_id)0x00000002)
-pub static V4L2_STD_PAL_B1: c_ulong = 0x2;
+pub static V4L2_STD_PAL_B1: u32 = 0x2;
 //#define V4L2_STD_PAL_G ((v4l2_std_id)0x00000004)
-pub static V4L2_STD_PAL_G: c_ulong = 0x4;
+pub static V4L2_STD_PAL_G: u32 = 0x4;
 //#define V4L2_STD_PAL_H ((v4l2_std_id)0x00000008)
-pub static V4L2_STD_PAL_H: c_ulong = 0x8;
+pub static V4L2_STD_PAL_H: u32 = 0x8;
 //#define V4L2_STD_PAL_I ((v4l2_std_id)0x00000010)
-pub static V4L2_STD_PAL_I: c_ulong = 0x10;
+pub static V4L2_STD_PAL_I: u32 = 0x10;
 //#define V4L2_STD_PAL_D ((v4l2_std_id)0x00000020)
-pub static V4L2_STD_PAL_D: c_ulong = 0x20;
+pub static V4L2_STD_PAL_D: u32 = 0x20;
 //#define V4L2_STD_PAL_D1 ((v4l2_std_id)0x00000040)
-pub static V4L2_STD_PAL_D1: c_ulong = 0x40;
+pub static V4L2_STD_PAL_D1: u32 = 0x40;
 //#define V4L2_STD_PAL_K ((v4l2_std_id)0x00000080)
-pub static V4L2_STD_PAL_K: c_ulong = 0x80;
+pub static V4L2_STD_PAL_K: u32 = 0x80;
 //#define V4L2_STD_PAL_M ((v4l2_std_id)0x00000100)
-pub static V4L2_STD_PAL_M: c_ulong = 0x100;
+pub static V4L2_STD_PAL_M: u32 = 0x100;
 //#define V4L2_STD_PAL_N ((v4l2_std_id)0x00000200)
-pub static V4L2_STD_PAL_N: c_ulong = 0x200;
+pub static V4L2_STD_PAL_N: u32 = 0x200;
 //#define V4L2_STD_PAL_Nc ((v4l2_std_id)0x00000400)
-pub static V4L2_STD_PAL_Nc: c_ulong = 0x400;
+pub static V4L2_STD_PAL_Nc: u32 = 0x400;
 //#define V4L2_STD_PAL_60 ((v4l2_std_id)0x00000800)
-pub static V4L2_STD_PAL_60: c_ulong = 0x800;
+pub static V4L2_STD_PAL_60: u32 = 0x800;
 //#define V4L2_STD_NTSC_M ((v4l2_std_id)0x00001000) /* BTSC */
-pub static V4L2_STD_NTSC_M: c_ulong = 0x1000;
+pub static V4L2_STD_NTSC_M: u32 = 0x1000;
 //#define V4L2_STD_NTSC_M_JP ((v4l2_std_id)0x00002000) /* EIA-J */
-pub static V4L2_STD_NTSC_M_JP: c_ulong = 0x2000;
+pub static V4L2_STD_NTSC_M_JP: u32 = 0x2000;
 //#define V4L2_STD_NTSC_443 ((v4l2_std_id)0x00004000)
-pub static V4L2_STD_NTSC_443: c_ulong = 0x4000;
+pub static V4L2_STD_NTSC_443: u32 = 0x4000;
 //#define V4L2_STD_NTSC_M_KR ((v4l2_std_id)0x00008000) /* FM A2 */
-pub static V4L2_STD_NTSC_M_KR: c_ulong = 0x8000;
+pub static V4L2_STD_NTSC_M_KR: u32 = 0x8000;
 //#define V4L2_STD_SECAM_B ((v4l2_std_id)0x00010000)
-pub static V4L2_STD_SECAM_B: c_ulong = 0x10000;
+pub static V4L2_STD_SECAM_B: u32 = 0x10000;
 //#define V4L2_STD_SECAM_D ((v4l2_std_id)0x00020000)
-pub static V4L2_STD_SECAM_D: c_ulong = 0x20000;
+pub static V4L2_STD_SECAM_D: u32 = 0x20000;
 //#define V4L2_STD_SECAM_G ((v4l2_std_id)0x00040000)
-pub static V4L2_STD_SECAM_G: c_ulong = 0x40000;
+pub static V4L2_STD_SECAM_G: u32 = 0x40000;
 //#define V4L2_STD_SECAM_H ((v4l2_std_id)0x00080000)
-pub static V4L2_STD_SECAM_H: c_ulong = 0x80000;
+pub static V4L2_STD_SECAM_H: u32 = 0x80000;
 //#define V4L2_STD_SECAM_K ((v4l2_std_id)0x00100000)
-pub static V4L2_STD_SECAM_K: c_ulong = 0x100000;
+pub static V4L2_STD_SECAM_K: u32 = 0x100000;
 //#define V4L2_STD_SECAM_K1 ((v4l2_std_id)0x00200000)
-pub static V4L2_STD_SECAM_K1: c_ulong = 0x200000;
+pub static V4L2_STD_SECAM_K1: u32 = 0x200000;
 //#define V4L2_STD_SECAM_L ((v4l2_std_id)0x00400000)
-pub static V4L2_STD_SECAM_L: c_ulong = 0x400000;
+pub static V4L2_STD_SECAM_L: u32 = 0x400000;
 //#define V4L2_STD_SECAM_LC ((v4l2_std_id)0x00800000)
-pub static V4L2_STD_SECAM_LC: c_ulong = 0x800000;
+pub static V4L2_STD_SECAM_LC: u32 = 0x800000;
 //#define V4L2_STD_ATSC_8_VSB ((v4l2_std_id)0x01000000)
-pub static V4L2_STD_ATSC_8_VSB: c_ulong = 0x1000000;
+pub static V4L2_STD_ATSC_8_VSB: u32 = 0x1000000;
 //#define V4L2_STD_ATSC_16_VSB ((v4l2_std_id)0x02000000)
-pub static V4L2_STD_ATSC_16_VSB: c_ulong = 0x2000000;
+pub static V4L2_STD_ATSC_16_VSB: u32 = 0x2000000;
 //#define V4L2_STD_NTSC (V4L2_STD_NTSC_M | ...
-pub static V4L2_STD_NTSC: c_ulong = 0xb000;
+pub static V4L2_STD_NTSC: u32 = 0xb000;
 //#define V4L2_STD_SECAM_DK (V4L2_STD_SECAM_D | ...
-pub static V4L2_STD_SECAM_DK: c_ulong = 0x320000;
+pub static V4L2_STD_SECAM_DK: u32 = 0x320000;
 //#define V4L2_STD_SECAM (V4L2_STD_SECAM_B | ...
-pub static V4L2_STD_SECAM: c_ulong = 0xff0000;
+pub static V4L2_STD_SECAM: u32 = 0xff0000;
 //#define V4L2_STD_PAL_BG (V4L2_STD_PAL_B | ...
-pub static V4L2_STD_PAL_BG: c_ulong = 0x7;
+pub static V4L2_STD_PAL_BG: u32 = 0x7;
 //#define V4L2_STD_PAL_DK (V4L2_STD_PAL_D | ...
-pub static V4L2_STD_PAL_DK: c_ulong = 0xe0;
+pub static V4L2_STD_PAL_DK: u32 = 0xe0;
 //#define V4L2_STD_PAL (V4L2_STD_PAL_BG | ...
-pub static V4L2_STD_PAL: c_ulong = 0xff;
+pub static V4L2_STD_PAL: u32 = 0xff;
 //#define V4L2_STD_B (V4L2_STD_PAL_B | ...
-pub static V4L2_STD_B: c_ulong = 0x10003;
+pub static V4L2_STD_B: u32 = 0x10003;
 //#define V4L2_STD_G (V4L2_STD_PAL_G | ...
-pub static V4L2_STD_G: c_ulong = 0x40004;
+pub static V4L2_STD_G: u32 = 0x40004;
 //#define V4L2_STD_H (V4L2_STD_PAL_H | ...
-pub static V4L2_STD_H: c_ulong = 0x80008;
+pub static V4L2_STD_H: u32 = 0x80008;
 //#define V4L2_STD_L (V4L2_STD_SECAM_L | ...
-pub static V4L2_STD_L: c_ulong = 0xc00000;
+pub static V4L2_STD_L: u32 = 0xc00000;
 //#define V4L2_STD_GH (V4L2_STD_G | ...
-pub static V4L2_STD_GH: c_ulong = 0xc000c;
+pub static V4L2_STD_GH: u32 = 0xc000c;
 //#define V4L2_STD_DK (V4L2_STD_PAL_DK | ...
-pub static V4L2_STD_DK: c_ulong = 0x3200e0;
+pub static V4L2_STD_DK: u32 = 0x3200e0;
 //#define V4L2_STD_BG (V4L2_STD_B | ...
-pub static V4L2_STD_BG: c_ulong = 0x50007;
+pub static V4L2_STD_BG: u32 = 0x50007;
 //#define V4L2_STD_MN (V4L2_STD_PAL_M | ...
-pub static V4L2_STD_MN: c_ulong = 0xb700;
+pub static V4L2_STD_MN: u32 = 0xb700;
 //#define V4L2_STD_MTS (V4L2_STD_NTSC_M | ...
-pub static V4L2_STD_MTS: c_ulong = 0x1700;
+pub static V4L2_STD_MTS: u32 = 0x1700;
 //#define V4L2_STD_525_60 (V4L2_STD_PAL_M | ...
-pub static V4L2_STD_525_60: c_ulong = 0xf900;
+pub static V4L2_STD_525_60: u32 = 0xf900;
 //#define V4L2_STD_625_50 (V4L2_STD_PAL | ...
-pub static V4L2_STD_625_50: c_ulong = 0xff06ff;
+pub static V4L2_STD_625_50: u32 = 0xff06ff;
 //#define V4L2_STD_ATSC (V4L2_STD_ATSC_8_VSB | ...
-pub static V4L2_STD_ATSC: c_ulong = 0x3000000;
+pub static V4L2_STD_ATSC: u32 = 0x3000000;
 //#define V4L2_STD_UNKNOWN 0
-pub static V4L2_STD_UNKNOWN: c_ulong = 0x0;
+pub static V4L2_STD_UNKNOWN: u32 = 0x0;
 //#define V4L2_STD_ALL (V4L2_STD_525_60 | ...
-pub static V4L2_STD_ALL: c_ulong = 0xffffff;
+pub static V4L2_STD_ALL: u32 = 0xffffff;
 //#define V4L2_DV_INVALID 0
-pub static V4L2_DV_INVALID: c_ulong = 0x0;
+pub static V4L2_DV_INVALID: u32 = 0x0;
 //#define V4L2_DV_480P59_94 1 /* BT.1362 */
-pub static V4L2_DV_480P59_94: c_ulong = 0x1;
+pub static V4L2_DV_480P59_94: u32 = 0x1;
 //#define V4L2_DV_576P50 2 /* BT.1362 */
-pub static V4L2_DV_576P50: c_ulong = 0x2;
+pub static V4L2_DV_576P50: u32 = 0x2;
 //#define V4L2_DV_720P24 3 /* SMPTE 296M */
-pub static V4L2_DV_720P24: c_ulong = 0x3;
+pub static V4L2_DV_720P24: u32 = 0x3;
 //#define V4L2_DV_720P25 4 /* SMPTE 296M */
-pub static V4L2_DV_720P25: c_ulong = 0x4;
+pub static V4L2_DV_720P25: u32 = 0x4;
 //#define V4L2_DV_720P30 5 /* SMPTE 296M */
-pub static V4L2_DV_720P30: c_ulong = 0x5;
+pub static V4L2_DV_720P30: u32 = 0x5;
 //#define V4L2_DV_720P50 6 /* SMPTE 296M */
-pub static V4L2_DV_720P50: c_ulong = 0x6;
+pub static V4L2_DV_720P50: u32 = 0x6;
 //#define V4L2_DV_720P59_94 7 /* SMPTE 274M */
-pub static V4L2_DV_720P59_94: c_ulong = 0x7;
+pub static V4L2_DV_720P59_94: u32 = 0x7;
 //#define V4L2_DV_720P60 8 /* SMPTE 274M/296M */
-pub static V4L2_DV_720P60: c_ulong = 0x8;
+pub static V4L2_DV_720P60: u32 = 0x8;
 //#define V4L2_DV_1080I29_97 9 /* BT.1120/ SMPTE 274M */
-pub static V4L2_DV_1080I29_97: c_ulong = 0x9;
+pub static V4L2_DV_1080I29_97: u32 = 0x9;
 //#define V4L2_DV_1080I30 10 /* BT.1120/ SMPTE 274M */
-pub static V4L2_DV_1080I30: c_ulong = 0xa;
+pub static V4L2_DV_1080I30: u32 = 0xa;
 //#define V4L2_DV_1080I25 11 /* BT.1120 */
-pub static V4L2_DV_1080I25: c_ulong = 0xb;
+pub static V4L2_DV_1080I25: u32 = 0xb;
 //#define V4L2_DV_1080I50 12 /* SMPTE 296M */
-pub static V4L2_DV_1080I50: c_ulong = 0xc;
+pub static V4L2_DV_1080I50: u32 = 0xc;
 //#define V4L2_DV_1080I60 13 /* SMPTE 296M */
-pub static V4L2_DV_1080I60: c_ulong = 0xd;
+pub static V4L2_DV_1080I60: u32 = 0xd;
 //#define V4L2_DV_1080P24 14 /* SMPTE 296M */
-pub static V4L2_DV_1080P24: c_ulong = 0xe;
+pub static V4L2_DV_1080P24: u32 = 0xe;
 //#define V4L2_DV_1080P25 15 /* SMPTE 296M */
-pub static V4L2_DV_1080P25: c_ulong = 0xf;
+pub static V4L2_DV_1080P25: u32 = 0xf;
 //#define V4L2_DV_1080P30 16 /* SMPTE 296M */
-pub static V4L2_DV_1080P30: c_ulong = 0x10;
+pub static V4L2_DV_1080P30: u32 = 0x10;
 //#define V4L2_DV_1080P50 17 /* BT.1120 */
-pub static V4L2_DV_1080P50: c_ulong = 0x11;
+pub static V4L2_DV_1080P50: u32 = 0x11;
 //#define V4L2_DV_1080P60 18 /* BT.1120 */
-pub static V4L2_DV_1080P60: c_ulong = 0x12;
+pub static V4L2_DV_1080P60: u32 = 0x12;
 //#define V4L2_DV_PROGRESSIVE 0
-pub static V4L2_DV_PROGRESSIVE: c_ulong = 0x0;
+pub static V4L2_DV_PROGRESSIVE: u32 = 0x0;
 //#define V4L2_DV_INTERLACED 1
-pub static V4L2_DV_INTERLACED: c_ulong = 0x1;
+pub static V4L2_DV_INTERLACED: u32 = 0x1;
 //#define V4L2_DV_VSYNC_POS_POL 0x00000001
-pub static V4L2_DV_VSYNC_POS_POL: c_ulong = 0x1;
+pub static V4L2_DV_VSYNC_POS_POL: u32 = 0x1;
 //#define V4L2_DV_HSYNC_POS_POL 0x00000002
-pub static V4L2_DV_HSYNC_POS_POL: c_ulong = 0x2;
+pub static V4L2_DV_HSYNC_POS_POL: u32 = 0x2;
 //#define V4L2_DV_BT_STD_CEA861 (1 << 0) /* CEA-861 Digital TV Profile */
-pub static V4L2_DV_BT_STD_CEA861: c_ulong = 0x1;
+pub static V4L2_DV_BT_STD_CEA861: u32 = 0x1;
 //#define V4L2_DV_BT_STD_DMT (1 << 1) /* VESA Discrete Monitor Timings */
-pub static V4L2_DV_BT_STD_DMT: c_ulong = 0x2;
+pub static V4L2_DV_BT_STD_DMT: u32 = 0x2;
 //#define V4L2_DV_BT_STD_CVT (1 << 2) /* VESA Coordinated Video Timings */
-pub static V4L2_DV_BT_STD_CVT: c_ulong = 0x4;
+pub static V4L2_DV_BT_STD_CVT: u32 = 0x4;
 //#define V4L2_DV_BT_STD_GTF (1 << 3) /* VESA Generalized Timings Formula */
-pub static V4L2_DV_BT_STD_GTF: c_ulong = 0x8;
+pub static V4L2_DV_BT_STD_GTF: u32 = 0x8;
 //#define V4L2_DV_FL_REDUCED_BLANKING (1 << 0)
-pub static V4L2_DV_FL_REDUCED_BLANKING: c_ulong = 0x1;
+pub static V4L2_DV_FL_REDUCED_BLANKING: u32 = 0x1;
 //#define V4L2_DV_FL_CAN_REDUCE_FPS (1 << 1)
-pub static V4L2_DV_FL_CAN_REDUCE_FPS: c_ulong = 0x2;
+pub static V4L2_DV_FL_CAN_REDUCE_FPS: u32 = 0x2;
 //#define V4L2_DV_FL_REDUCED_FPS (1 << 2)
-pub static V4L2_DV_FL_REDUCED_FPS: c_ulong = 0x4;
+pub static V4L2_DV_FL_REDUCED_FPS: u32 = 0x4;
 //#define V4L2_DV_FL_HALF_LINE (1 << 0)
-pub static V4L2_DV_FL_HALF_LINE: c_ulong = 0x1;
+pub static V4L2_DV_FL_HALF_LINE: u32 = 0x1;
 //#define V4L2_DV_BT_656_1120 0 /* BT.656/1120 timing type */
-pub static V4L2_DV_BT_656_1120: c_ulong = 0x0;
+pub static V4L2_DV_BT_656_1120: u32 = 0x0;
 //#define V4L2_DV_BT_CAP_INTERLACED (1 << 0)
-pub static V4L2_DV_BT_CAP_INTERLACED: c_ulong = 0x1;
+pub static V4L2_DV_BT_CAP_INTERLACED: u32 = 0x1;
 //#define V4L2_DV_BT_CAP_PROGRESSIVE (1 << 1)
-pub static V4L2_DV_BT_CAP_PROGRESSIVE: c_ulong = 0x2;
+pub static V4L2_DV_BT_CAP_PROGRESSIVE: u32 = 0x2;
 //#define V4L2_DV_BT_CAP_REDUCED_BLANKING (1 << 2)
-pub static V4L2_DV_BT_CAP_REDUCED_BLANKING: c_ulong = 0x4;
+pub static V4L2_DV_BT_CAP_REDUCED_BLANKING: u32 = 0x4;
 //#define V4L2_DV_BT_CAP_CUSTOM (1 << 3)
-pub static V4L2_DV_BT_CAP_CUSTOM: c_ulong = 0x8;
+pub static V4L2_DV_BT_CAP_CUSTOM: u32 = 0x8;
 //#define V4L2_INPUT_TYPE_TUNER 1
-pub static V4L2_INPUT_TYPE_TUNER: c_ulong = 0x1;
+pub static V4L2_INPUT_TYPE_TUNER: u32 = 0x1;
 //#define V4L2_INPUT_TYPE_CAMERA 2
-pub static V4L2_INPUT_TYPE_CAMERA: c_ulong = 0x2;
+pub static V4L2_INPUT_TYPE_CAMERA: u32 = 0x2;
 //#define V4L2_IN_ST_NO_POWER 0x00000001 /* Attached device is off */
-pub static V4L2_IN_ST_NO_POWER: c_ulong = 0x1;
+pub static V4L2_IN_ST_NO_POWER: u32 = 0x1;
 //#define V4L2_IN_ST_NO_SIGNAL 0x00000002
-pub static V4L2_IN_ST_NO_SIGNAL: c_ulong = 0x2;
+pub static V4L2_IN_ST_NO_SIGNAL: u32 = 0x2;
 //#define V4L2_IN_ST_NO_COLOR 0x00000004
-pub static V4L2_IN_ST_NO_COLOR: c_ulong = 0x4;
+pub static V4L2_IN_ST_NO_COLOR: u32 = 0x4;
 //#define V4L2_IN_ST_HFLIP 0x00000010 /* Frames are flipped horizontally */
-pub static V4L2_IN_ST_HFLIP: c_ulong = 0x10;
+pub static V4L2_IN_ST_HFLIP: u32 = 0x10;
 //#define V4L2_IN_ST_VFLIP 0x00000020 /* Frames are flipped vertically */
-pub static V4L2_IN_ST_VFLIP: c_ulong = 0x20;
+pub static V4L2_IN_ST_VFLIP: u32 = 0x20;
 //#define V4L2_IN_ST_NO_H_LOCK 0x00000100 /* No horizontal sync lock */
-pub static V4L2_IN_ST_NO_H_LOCK: c_ulong = 0x100;
+pub static V4L2_IN_ST_NO_H_LOCK: u32 = 0x100;
 //#define V4L2_IN_ST_COLOR_KILL 0x00000200 /* Color killer is active */
-pub static V4L2_IN_ST_COLOR_KILL: c_ulong = 0x200;
+pub static V4L2_IN_ST_COLOR_KILL: u32 = 0x200;
 //#define V4L2_IN_ST_NO_SYNC 0x00010000 /* No synchronization lock */
-pub static V4L2_IN_ST_NO_SYNC: c_ulong = 0x10000;
+pub static V4L2_IN_ST_NO_SYNC: u32 = 0x10000;
 //#define V4L2_IN_ST_NO_EQU 0x00020000 /* No equalizer lock */
-pub static V4L2_IN_ST_NO_EQU: c_ulong = 0x20000;
+pub static V4L2_IN_ST_NO_EQU: u32 = 0x20000;
 //#define V4L2_IN_ST_NO_CARRIER 0x00040000 /* Carrier recovery failed */
-pub static V4L2_IN_ST_NO_CARRIER: c_ulong = 0x40000;
+pub static V4L2_IN_ST_NO_CARRIER: u32 = 0x40000;
 //#define V4L2_IN_ST_MACROVISION 0x01000000 /* Macrovision detected */
-pub static V4L2_IN_ST_MACROVISION: c_ulong = 0x1000000;
+pub static V4L2_IN_ST_MACROVISION: u32 = 0x1000000;
 //#define V4L2_IN_ST_NO_ACCESS 0x02000000 /* Conditional access denied */
-pub static V4L2_IN_ST_NO_ACCESS: c_ulong = 0x2000000;
+pub static V4L2_IN_ST_NO_ACCESS: u32 = 0x2000000;
 //#define V4L2_IN_ST_VTR 0x04000000 /* VTR time constant */
-pub static V4L2_IN_ST_VTR: c_ulong = 0x4000000;
+pub static V4L2_IN_ST_VTR: u32 = 0x4000000;
 //#define V4L2_IN_CAP_PRESETS 0x00000001 /* Supports S_DV_PRESET */
-pub static V4L2_IN_CAP_PRESETS: c_ulong = 0x1;
+pub static V4L2_IN_CAP_PRESETS: u32 = 0x1;
 //#define V4L2_IN_CAP_DV_TIMINGS 0x00000002 /* Supports S_DV_TIMINGS */
-pub static V4L2_IN_CAP_DV_TIMINGS: c_ulong = 0x2;
+pub static V4L2_IN_CAP_DV_TIMINGS: u32 = 0x2;
 //#define V4L2_IN_CAP_CUSTOM_TIMINGS V4L2_IN_CAP_DV_TIMINGS /* For compatibility */
-pub static V4L2_IN_CAP_CUSTOM_TIMINGS: c_ulong = 0x2;
+pub static V4L2_IN_CAP_CUSTOM_TIMINGS: u32 = 0x2;
 //#define V4L2_IN_CAP_STD 0x00000004 /* Supports S_STD */
-pub static V4L2_IN_CAP_STD: c_ulong = 0x4;
+pub static V4L2_IN_CAP_STD: u32 = 0x4;
 //#define V4L2_OUTPUT_TYPE_MODULATOR 1
-pub static V4L2_OUTPUT_TYPE_MODULATOR: c_ulong = 0x1;
+pub static V4L2_OUTPUT_TYPE_MODULATOR: u32 = 0x1;
 //#define V4L2_OUTPUT_TYPE_ANALOG 2
-pub static V4L2_OUTPUT_TYPE_ANALOG: c_ulong = 0x2;
+pub static V4L2_OUTPUT_TYPE_ANALOG: u32 = 0x2;
 //#define V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY 3
-pub static V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY: c_ulong = 0x3;
+pub static V4L2_OUTPUT_TYPE_ANALOGVGAOVERLAY: u32 = 0x3;
 //#define V4L2_OUT_CAP_PRESETS 0x00000001 /* Supports S_DV_PRESET */
-pub static V4L2_OUT_CAP_PRESETS: c_ulong = 0x1;
+pub static V4L2_OUT_CAP_PRESETS: u32 = 0x1;
 //#define V4L2_OUT_CAP_DV_TIMINGS 0x00000002 /* Supports S_DV_TIMINGS */
-pub static V4L2_OUT_CAP_DV_TIMINGS: c_ulong = 0x2;
+pub static V4L2_OUT_CAP_DV_TIMINGS: u32 = 0x2;
 //#define V4L2_OUT_CAP_CUSTOM_TIMINGS V4L2_OUT_CAP_DV_TIMINGS /* For compatibility */
-pub static V4L2_OUT_CAP_CUSTOM_TIMINGS: c_ulong = 0x2;
+pub static V4L2_OUT_CAP_CUSTOM_TIMINGS: u32 = 0x2;
 //#define V4L2_OUT_CAP_STD 0x00000004 /* Supports S_STD */
-pub static V4L2_OUT_CAP_STD: c_ulong = 0x4;
+pub static V4L2_OUT_CAP_STD: u32 = 0x4;
 //#define V4L2_CTRL_ID_MASK (0x0fffffff)
-pub static V4L2_CTRL_ID_MASK: c_ulong = 0xfffffff;
+pub static V4L2_CTRL_ID_MASK: u32 = 0xfffffff;
 //#define V4L2_CTRL_FLAG_DISABLED 0x0001
-pub static V4L2_CTRL_FLAG_DISABLED: c_ulong = 0x1;
+pub static V4L2_CTRL_FLAG_DISABLED: u32 = 0x1;
 //#define V4L2_CTRL_FLAG_GRABBED 0x0002
-pub static V4L2_CTRL_FLAG_GRABBED: c_ulong = 0x2;
+pub static V4L2_CTRL_FLAG_GRABBED: u32 = 0x2;
 //#define V4L2_CTRL_FLAG_READ_ONLY 0x0004
-pub static V4L2_CTRL_FLAG_READ_ONLY: c_ulong = 0x4;
+pub static V4L2_CTRL_FLAG_READ_ONLY: u32 = 0x4;
 //#define V4L2_CTRL_FLAG_UPDATE 0x0008
-pub static V4L2_CTRL_FLAG_UPDATE: c_ulong = 0x8;
+pub static V4L2_CTRL_FLAG_UPDATE: u32 = 0x8;
 //#define V4L2_CTRL_FLAG_INACTIVE 0x0010
-pub static V4L2_CTRL_FLAG_INACTIVE: c_ulong = 0x10;
+pub static V4L2_CTRL_FLAG_INACTIVE: u32 = 0x10;
 //#define V4L2_CTRL_FLAG_SLIDER 0x0020
-pub static V4L2_CTRL_FLAG_SLIDER: c_ulong = 0x20;
+pub static V4L2_CTRL_FLAG_SLIDER: u32 = 0x20;
 //#define V4L2_CTRL_FLAG_WRITE_ONLY 0x0040
-pub static V4L2_CTRL_FLAG_WRITE_ONLY: c_ulong = 0x40;
+pub static V4L2_CTRL_FLAG_WRITE_ONLY: u32 = 0x40;
 //#define V4L2_CTRL_FLAG_VOLATILE 0x0080
-pub static V4L2_CTRL_FLAG_VOLATILE: c_ulong = 0x80;
+pub static V4L2_CTRL_FLAG_VOLATILE: u32 = 0x80;
 //#define V4L2_CTRL_FLAG_NEXT_CTRL 0x80000000
-pub static V4L2_CTRL_FLAG_NEXT_CTRL: c_ulong = 0x80000000;
+pub static V4L2_CTRL_FLAG_NEXT_CTRL: u32 = 0x80000000;
 //#define V4L2_CID_MAX_CTRLS 1024
-pub static V4L2_CID_MAX_CTRLS: c_ulong = 0x400;
+pub static V4L2_CID_MAX_CTRLS: u32 = 0x400;
 //#define V4L2_CID_PRIVATE_BASE 0x08000000
-pub static V4L2_CID_PRIVATE_BASE: c_ulong = 0x8000000;
+pub static V4L2_CID_PRIVATE_BASE: u32 = 0x8000000;
 //#define V4L2_CID_DV_CLASS_BASE (V4L2_CTRL_CLASS_DV | 0x900)
-pub static V4L2_CID_DV_CLASS_BASE: c_ulong = 0xa00900;
+pub static V4L2_CID_DV_CLASS_BASE: u32 = 0xa00900;
 //#define V4L2_CID_DV_CLASS (V4L2_CTRL_CLASS_DV | 1)
-pub static V4L2_CID_DV_CLASS: c_ulong = 0xa00001;
+pub static V4L2_CID_DV_CLASS: u32 = 0xa00001;
 //#define V4L2_CID_DV_TX_HOTPLUG (V4L2_CID_DV_CLASS_BASE + 1)
-pub static V4L2_CID_DV_TX_HOTPLUG: c_ulong = 0xa00901;
+pub static V4L2_CID_DV_TX_HOTPLUG: u32 = 0xa00901;
 //#define V4L2_CID_DV_TX_RXSENSE (V4L2_CID_DV_CLASS_BASE + 2)
-pub static V4L2_CID_DV_TX_RXSENSE: c_ulong = 0xa00902;
+pub static V4L2_CID_DV_TX_RXSENSE: u32 = 0xa00902;
 //#define V4L2_CID_DV_TX_EDID_PRESENT (V4L2_CID_DV_CLASS_BASE + 3)
-pub static V4L2_CID_DV_TX_EDID_PRESENT: c_ulong = 0xa00903;
+pub static V4L2_CID_DV_TX_EDID_PRESENT: u32 = 0xa00903;
 //#define V4L2_CID_DV_TX_MODE (V4L2_CID_DV_CLASS_BASE + 4)
-pub static V4L2_CID_DV_TX_MODE: c_ulong = 0xa00904;
+pub static V4L2_CID_DV_TX_MODE: u32 = 0xa00904;
 //#define V4L2_CID_DV_TX_RGB_RANGE (V4L2_CID_DV_CLASS_BASE + 5)
-pub static V4L2_CID_DV_TX_RGB_RANGE: c_ulong = 0xa00905;
+pub static V4L2_CID_DV_TX_RGB_RANGE: u32 = 0xa00905;
 //#define V4L2_CID_DV_RX_POWER_PRESENT (V4L2_CID_DV_CLASS_BASE + 100)
-pub static V4L2_CID_DV_RX_POWER_PRESENT: c_ulong = 0xa00964;
+pub static V4L2_CID_DV_RX_POWER_PRESENT: u32 = 0xa00964;
 //#define V4L2_CID_DV_RX_RGB_RANGE (V4L2_CID_DV_CLASS_BASE + 101)
-pub static V4L2_CID_DV_RX_RGB_RANGE: c_ulong = 0xa00965;
+pub static V4L2_CID_DV_RX_RGB_RANGE: u32 = 0xa00965;
 //#define V4L2_TUNER_CAP_LOW 0x0001
-pub static V4L2_TUNER_CAP_LOW: c_ulong = 0x1;
+pub static V4L2_TUNER_CAP_LOW: u32 = 0x1;
 //#define V4L2_TUNER_CAP_NORM 0x0002
-pub static V4L2_TUNER_CAP_NORM: c_ulong = 0x2;
+pub static V4L2_TUNER_CAP_NORM: u32 = 0x2;
 //#define V4L2_TUNER_CAP_HWSEEK_BOUNDED 0x0004
-pub static V4L2_TUNER_CAP_HWSEEK_BOUNDED: c_ulong = 0x4;
+pub static V4L2_TUNER_CAP_HWSEEK_BOUNDED: u32 = 0x4;
 //#define V4L2_TUNER_CAP_HWSEEK_WRAP 0x0008
-pub static V4L2_TUNER_CAP_HWSEEK_WRAP: c_ulong = 0x8;
+pub static V4L2_TUNER_CAP_HWSEEK_WRAP: u32 = 0x8;
 //#define V4L2_TUNER_CAP_STEREO 0x0010
-pub static V4L2_TUNER_CAP_STEREO: c_ulong = 0x10;
+pub static V4L2_TUNER_CAP_STEREO: u32 = 0x10;
 //#define V4L2_TUNER_CAP_LANG2 0x0020
-pub static V4L2_TUNER_CAP_LANG2: c_ulong = 0x20;
+pub static V4L2_TUNER_CAP_LANG2: u32 = 0x20;
 //#define V4L2_TUNER_CAP_SAP 0x0020
-pub static V4L2_TUNER_CAP_SAP: c_ulong = 0x20;
+pub static V4L2_TUNER_CAP_SAP: u32 = 0x20;
 //#define V4L2_TUNER_CAP_LANG1 0x0040
-pub static V4L2_TUNER_CAP_LANG1: c_ulong = 0x40;
+pub static V4L2_TUNER_CAP_LANG1: u32 = 0x40;
 //#define V4L2_TUNER_CAP_RDS 0x0080
-pub static V4L2_TUNER_CAP_RDS: c_ulong = 0x80;
+pub static V4L2_TUNER_CAP_RDS: u32 = 0x80;
 //#define V4L2_TUNER_CAP_RDS_BLOCK_IO 0x0100
-pub static V4L2_TUNER_CAP_RDS_BLOCK_IO: c_ulong = 0x100;
+pub static V4L2_TUNER_CAP_RDS_BLOCK_IO: u32 = 0x100;
 //#define V4L2_TUNER_CAP_RDS_CONTROLS 0x0200
-pub static V4L2_TUNER_CAP_RDS_CONTROLS: c_ulong = 0x200;
+pub static V4L2_TUNER_CAP_RDS_CONTROLS: u32 = 0x200;
 //#define V4L2_TUNER_CAP_FREQ_BANDS 0x0400
-pub static V4L2_TUNER_CAP_FREQ_BANDS: c_ulong = 0x400;
+pub static V4L2_TUNER_CAP_FREQ_BANDS: u32 = 0x400;
 //#define V4L2_TUNER_CAP_HWSEEK_PROG_LIM 0x0800
-pub static V4L2_TUNER_CAP_HWSEEK_PROG_LIM: c_ulong = 0x800;
+pub static V4L2_TUNER_CAP_HWSEEK_PROG_LIM: u32 = 0x800;
 //#define V4L2_TUNER_SUB_MONO 0x0001
-pub static V4L2_TUNER_SUB_MONO: c_ulong = 0x1;
+pub static V4L2_TUNER_SUB_MONO: u32 = 0x1;
 //#define V4L2_TUNER_SUB_STEREO 0x0002
-pub static V4L2_TUNER_SUB_STEREO: c_ulong = 0x2;
+pub static V4L2_TUNER_SUB_STEREO: u32 = 0x2;
 //#define V4L2_TUNER_SUB_LANG2 0x0004
-pub static V4L2_TUNER_SUB_LANG2: c_ulong = 0x4;
+pub static V4L2_TUNER_SUB_LANG2: u32 = 0x4;
 //#define V4L2_TUNER_SUB_SAP 0x0004
-pub static V4L2_TUNER_SUB_SAP: c_ulong = 0x4;
+pub static V4L2_TUNER_SUB_SAP: u32 = 0x4;
 //#define V4L2_TUNER_SUB_LANG1 0x0008
-pub static V4L2_TUNER_SUB_LANG1: c_ulong = 0x8;
+pub static V4L2_TUNER_SUB_LANG1: u32 = 0x8;
 //#define V4L2_TUNER_SUB_RDS 0x0010
-pub static V4L2_TUNER_SUB_RDS: c_ulong = 0x10;
+pub static V4L2_TUNER_SUB_RDS: u32 = 0x10;
 //#define V4L2_TUNER_MODE_MONO 0x0000
-pub static V4L2_TUNER_MODE_MONO: c_ulong = 0x0;
+pub static V4L2_TUNER_MODE_MONO: u32 = 0x0;
 //#define V4L2_TUNER_MODE_STEREO 0x0001
-pub static V4L2_TUNER_MODE_STEREO: c_ulong = 0x1;
+pub static V4L2_TUNER_MODE_STEREO: u32 = 0x1;
 //#define V4L2_TUNER_MODE_LANG2 0x0002
-pub static V4L2_TUNER_MODE_LANG2: c_ulong = 0x2;
+pub static V4L2_TUNER_MODE_LANG2: u32 = 0x2;
 //#define V4L2_TUNER_MODE_SAP 0x0002
-pub static V4L2_TUNER_MODE_SAP: c_ulong = 0x2;
+pub static V4L2_TUNER_MODE_SAP: u32 = 0x2;
 //#define V4L2_TUNER_MODE_LANG1 0x0003
-pub static V4L2_TUNER_MODE_LANG1: c_ulong = 0x3;
+pub static V4L2_TUNER_MODE_LANG1: u32 = 0x3;
 //#define V4L2_TUNER_MODE_LANG1_LANG2 0x0004
-pub static V4L2_TUNER_MODE_LANG1_LANG2: c_ulong = 0x4;
+pub static V4L2_TUNER_MODE_LANG1_LANG2: u32 = 0x4;
 //#define V4L2_BAND_MODULATION_VSB (1 << 1)
-pub static V4L2_BAND_MODULATION_VSB: c_ulong = 0x2;
+pub static V4L2_BAND_MODULATION_VSB: u32 = 0x2;
 //#define V4L2_BAND_MODULATION_FM (1 << 2)
-pub static V4L2_BAND_MODULATION_FM: c_ulong = 0x4;
+pub static V4L2_BAND_MODULATION_FM: u32 = 0x4;
 //#define V4L2_BAND_MODULATION_AM (1 << 3)
-pub static V4L2_BAND_MODULATION_AM: c_ulong = 0x8;
+pub static V4L2_BAND_MODULATION_AM: u32 = 0x8;
 //#define V4L2_RDS_BLOCK_MSK 0x7
-pub static V4L2_RDS_BLOCK_MSK: c_ulong = 0x7;
+pub static V4L2_RDS_BLOCK_MSK: u32 = 0x7;
 //#define V4L2_RDS_BLOCK_A 0
-pub static V4L2_RDS_BLOCK_A: c_ulong = 0x0;
+pub static V4L2_RDS_BLOCK_A: u32 = 0x0;
 //#define V4L2_RDS_BLOCK_B 1
-pub static V4L2_RDS_BLOCK_B: c_ulong = 0x1;
+pub static V4L2_RDS_BLOCK_B: u32 = 0x1;
 //#define V4L2_RDS_BLOCK_C 2
-pub static V4L2_RDS_BLOCK_C: c_ulong = 0x2;
+pub static V4L2_RDS_BLOCK_C: u32 = 0x2;
 //#define V4L2_RDS_BLOCK_D 3
-pub static V4L2_RDS_BLOCK_D: c_ulong = 0x3;
+pub static V4L2_RDS_BLOCK_D: u32 = 0x3;
 //#define V4L2_RDS_BLOCK_C_ALT 4
-pub static V4L2_RDS_BLOCK_C_ALT: c_ulong = 0x4;
+pub static V4L2_RDS_BLOCK_C_ALT: u32 = 0x4;
 //#define V4L2_RDS_BLOCK_INVALID 7
-pub static V4L2_RDS_BLOCK_INVALID: c_ulong = 0x7;
+pub static V4L2_RDS_BLOCK_INVALID: u32 = 0x7;
 //#define V4L2_RDS_BLOCK_CORRECTED 0x40
-pub static V4L2_RDS_BLOCK_CORRECTED: c_ulong = 0x40;
+pub static V4L2_RDS_BLOCK_CORRECTED: u32 = 0x40;
 //#define V4L2_RDS_BLOCK_ERROR 0x80
-pub static V4L2_RDS_BLOCK_ERROR: c_ulong = 0x80;
+pub static V4L2_RDS_BLOCK_ERROR: u32 = 0x80;
 //#define V4L2_AUDCAP_STEREO 0x00001
-pub static V4L2_AUDCAP_STEREO: c_ulong = 0x1;
+pub static V4L2_AUDCAP_STEREO: u32 = 0x1;
 //#define V4L2_AUDCAP_AVL 0x00002
-pub static V4L2_AUDCAP_AVL: c_ulong = 0x2;
+pub static V4L2_AUDCAP_AVL: u32 = 0x2;
 //#define V4L2_AUDMODE_AVL 0x00001
-pub static V4L2_AUDMODE_AVL: c_ulong = 0x1;
+pub static V4L2_AUDMODE_AVL: u32 = 0x1;
 //#define V4L2_ENC_IDX_FRAME_I (0)
-pub static V4L2_ENC_IDX_FRAME_I: c_ulong = 0x0;
+pub static V4L2_ENC_IDX_FRAME_I: u32 = 0x0;
 //#define V4L2_ENC_IDX_FRAME_P (1)
-pub static V4L2_ENC_IDX_FRAME_P: c_ulong = 0x1;
+pub static V4L2_ENC_IDX_FRAME_P: u32 = 0x1;
 //#define V4L2_ENC_IDX_FRAME_B (2)
-pub static V4L2_ENC_IDX_FRAME_B: c_ulong = 0x2;
+pub static V4L2_ENC_IDX_FRAME_B: u32 = 0x2;
 //#define V4L2_ENC_IDX_FRAME_MASK (0xf)
-pub static V4L2_ENC_IDX_FRAME_MASK: c_ulong = 0xf;
+pub static V4L2_ENC_IDX_FRAME_MASK: u32 = 0xf;
 //#define V4L2_ENC_IDX_ENTRIES (64)
-pub static V4L2_ENC_IDX_ENTRIES: c_ulong = 0x40;
+pub static V4L2_ENC_IDX_ENTRIES: u32 = 0x40;
 //#define V4L2_ENC_CMD_START (0)
-pub static V4L2_ENC_CMD_START: c_ulong = 0x0;
+pub static V4L2_ENC_CMD_START: u32 = 0x0;
 //#define V4L2_ENC_CMD_STOP (1)
-pub static V4L2_ENC_CMD_STOP: c_ulong = 0x1;
+pub static V4L2_ENC_CMD_STOP: u32 = 0x1;
 //#define V4L2_ENC_CMD_PAUSE (2)
-pub static V4L2_ENC_CMD_PAUSE: c_ulong = 0x2;
+pub static V4L2_ENC_CMD_PAUSE: u32 = 0x2;
 //#define V4L2_ENC_CMD_RESUME (3)
-pub static V4L2_ENC_CMD_RESUME: c_ulong = 0x3;
+pub static V4L2_ENC_CMD_RESUME: u32 = 0x3;
 //#define V4L2_ENC_CMD_STOP_AT_GOP_END (1 << 0)
-pub static V4L2_ENC_CMD_STOP_AT_GOP_END: c_ulong = 0x1;
+pub static V4L2_ENC_CMD_STOP_AT_GOP_END: u32 = 0x1;
 //#define V4L2_DEC_CMD_START (0)
-pub static V4L2_DEC_CMD_START: c_ulong = 0x0;
+pub static V4L2_DEC_CMD_START: u32 = 0x0;
 //#define V4L2_DEC_CMD_STOP (1)
-pub static V4L2_DEC_CMD_STOP: c_ulong = 0x1;
+pub static V4L2_DEC_CMD_STOP: u32 = 0x1;
 //#define V4L2_DEC_CMD_PAUSE (2)
-pub static V4L2_DEC_CMD_PAUSE: c_ulong = 0x2;
+pub static V4L2_DEC_CMD_PAUSE: u32 = 0x2;
 //#define V4L2_DEC_CMD_RESUME (3)
-pub static V4L2_DEC_CMD_RESUME: c_ulong = 0x3;
+pub static V4L2_DEC_CMD_RESUME: u32 = 0x3;
 //#define V4L2_DEC_CMD_START_MUTE_AUDIO (1 << 0)
-pub static V4L2_DEC_CMD_START_MUTE_AUDIO: c_ulong = 0x1;
+pub static V4L2_DEC_CMD_START_MUTE_AUDIO: u32 = 0x1;
 //#define V4L2_DEC_CMD_PAUSE_TO_BLACK (1 << 0)
-pub static V4L2_DEC_CMD_PAUSE_TO_BLACK: c_ulong = 0x1;
+pub static V4L2_DEC_CMD_PAUSE_TO_BLACK: u32 = 0x1;
 //#define V4L2_DEC_CMD_STOP_TO_BLACK (1 << 0)
-pub static V4L2_DEC_CMD_STOP_TO_BLACK: c_ulong = 0x1;
+pub static V4L2_DEC_CMD_STOP_TO_BLACK: u32 = 0x1;
 //#define V4L2_DEC_CMD_STOP_IMMEDIATELY (1 << 1)
-pub static V4L2_DEC_CMD_STOP_IMMEDIATELY: c_ulong = 0x2;
+pub static V4L2_DEC_CMD_STOP_IMMEDIATELY: u32 = 0x2;
 //#define V4L2_DEC_START_FMT_NONE (0)
-pub static V4L2_DEC_START_FMT_NONE: c_ulong = 0x0;
+pub static V4L2_DEC_START_FMT_NONE: u32 = 0x0;
 //#define V4L2_DEC_START_FMT_GOP (1)
-pub static V4L2_DEC_START_FMT_GOP: c_ulong = 0x1;
+pub static V4L2_DEC_START_FMT_GOP: u32 = 0x1;
 //#define V4L2_VBI_UNSYNC (1 << 0)
-pub static V4L2_VBI_UNSYNC: c_ulong = 0x1;
+pub static V4L2_VBI_UNSYNC: u32 = 0x1;
 //#define V4L2_VBI_INTERLACED (1 << 1)
-pub static V4L2_VBI_INTERLACED: c_ulong = 0x2;
+pub static V4L2_VBI_INTERLACED: u32 = 0x2;
 //#define V4L2_SLICED_TELETEXT_B (0x0001)
-pub static V4L2_SLICED_TELETEXT_B: c_ulong = 0x1;
+pub static V4L2_SLICED_TELETEXT_B: u32 = 0x1;
 //#define V4L2_SLICED_VPS (0x0400)
-pub static V4L2_SLICED_VPS: c_ulong = 0x400;
+pub static V4L2_SLICED_VPS: u32 = 0x400;
 //#define V4L2_SLICED_CAPTION_525 (0x1000)
-pub static V4L2_SLICED_CAPTION_525: c_ulong = 0x1000;
+pub static V4L2_SLICED_CAPTION_525: u32 = 0x1000;
 //#define V4L2_SLICED_WSS_625 (0x4000)
-pub static V4L2_SLICED_WSS_625: c_ulong = 0x4000;
+pub static V4L2_SLICED_WSS_625: u32 = 0x4000;
 //#define V4L2_SLICED_VBI_525 (V4L2_SLICED_CAPTION_525)
-pub static V4L2_SLICED_VBI_525: c_ulong = 0x1000;
+pub static V4L2_SLICED_VBI_525: u32 = 0x1000;
 //#define V4L2_SLICED_VBI_625 (V4L2_SLICED_TELETEXT_B | V4L2_SLICED_VPS | V4L2_SLICED_WSS_625)
-pub static V4L2_SLICED_VBI_625: c_ulong = 0x4401;
+pub static V4L2_SLICED_VBI_625: u32 = 0x4401;
 //#define V4L2_MPEG_VBI_IVTV_TELETEXT_B (1)
-pub static V4L2_MPEG_VBI_IVTV_TELETEXT_B: c_ulong = 0x1;
+pub static V4L2_MPEG_VBI_IVTV_TELETEXT_B: u32 = 0x1;
 //#define V4L2_MPEG_VBI_IVTV_CAPTION_525 (4)
-pub static V4L2_MPEG_VBI_IVTV_CAPTION_525: c_ulong = 0x4;
+pub static V4L2_MPEG_VBI_IVTV_CAPTION_525: u32 = 0x4;
 //#define V4L2_MPEG_VBI_IVTV_WSS_625 (5)
-pub static V4L2_MPEG_VBI_IVTV_WSS_625: c_ulong = 0x5;
+pub static V4L2_MPEG_VBI_IVTV_WSS_625: u32 = 0x5;
 //#define V4L2_MPEG_VBI_IVTV_VPS (7)
-pub static V4L2_MPEG_VBI_IVTV_VPS: c_ulong = 0x7;
+pub static V4L2_MPEG_VBI_IVTV_VPS: u32 = 0x7;
 //#define V4L2_MPEG_VBI_IVTV_MAGIC0 "itv0"
-pub static V4L2_MPEG_VBI_IVTV_MAGIC0: c_ulong = 0x40ca9b;
+pub static V4L2_MPEG_VBI_IVTV_MAGIC0: u32 = 0x40ca9b;
 //#define V4L2_MPEG_VBI_IVTV_MAGIC1 "ITV0"
-pub static V4L2_MPEG_VBI_IVTV_MAGIC1: c_ulong = 0x40caeb;
+pub static V4L2_MPEG_VBI_IVTV_MAGIC1: u32 = 0x40caeb;
 //#define V4L2_EVENT_ALL 0
-pub static V4L2_EVENT_ALL: c_ulong = 0x0;
+pub static V4L2_EVENT_ALL: u32 = 0x0;
 //#define V4L2_EVENT_VSYNC 1
-pub static V4L2_EVENT_VSYNC: c_ulong = 0x1;
+pub static V4L2_EVENT_VSYNC: u32 = 0x1;
 //#define V4L2_EVENT_EOS 2
-pub static V4L2_EVENT_EOS: c_ulong = 0x2;
+pub static V4L2_EVENT_EOS: u32 = 0x2;
 //#define V4L2_EVENT_CTRL 3
-pub static V4L2_EVENT_CTRL: c_ulong = 0x3;
+pub static V4L2_EVENT_CTRL: u32 = 0x3;
 //#define V4L2_EVENT_FRAME_SYNC 4
-pub static V4L2_EVENT_FRAME_SYNC: c_ulong = 0x4;
+pub static V4L2_EVENT_FRAME_SYNC: u32 = 0x4;
 //#define V4L2_EVENT_PRIVATE_START 0x08000000
-pub static V4L2_EVENT_PRIVATE_START: c_ulong = 0x8000000;
+pub static V4L2_EVENT_PRIVATE_START: u32 = 0x8000000;
 //#define V4L2_EVENT_CTRL_CH_VALUE (1 << 0)
-pub static V4L2_EVENT_CTRL_CH_VALUE: c_ulong = 0x1;
+pub static V4L2_EVENT_CTRL_CH_VALUE: u32 = 0x1;
 //#define V4L2_EVENT_CTRL_CH_FLAGS (1 << 1)
-pub static V4L2_EVENT_CTRL_CH_FLAGS: c_ulong = 0x2;
+pub static V4L2_EVENT_CTRL_CH_FLAGS: u32 = 0x2;
 //#define V4L2_EVENT_SUB_FL_SEND_INITIAL (1 << 0)
-pub static V4L2_EVENT_SUB_FL_SEND_INITIAL: c_ulong = 0x1;
+pub static V4L2_EVENT_SUB_FL_SEND_INITIAL: u32 = 0x1;
 //#define V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK (1 << 1)
-pub static V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK: c_ulong = 0x2;
+pub static V4L2_EVENT_SUB_FL_ALLOW_FEEDBACK: u32 = 0x2;
 //#define V4L2_CHIP_MATCH_HOST 0 /* Match against chip ID on host (0 for the host) */
-pub static V4L2_CHIP_MATCH_HOST: c_ulong = 0x0;
+pub static V4L2_CHIP_MATCH_HOST: u32 = 0x0;
 //#define V4L2_CHIP_MATCH_I2C_DRIVER 1 /* Match against I2C driver name */
-pub static V4L2_CHIP_MATCH_I2C_DRIVER: c_ulong = 0x1;
+pub static V4L2_CHIP_MATCH_I2C_DRIVER: u32 = 0x1;
 //#define V4L2_CHIP_MATCH_I2C_ADDR 2 /* Match against I2C 7-bit address */
-pub static V4L2_CHIP_MATCH_I2C_ADDR: c_ulong = 0x2;
+pub static V4L2_CHIP_MATCH_I2C_ADDR: u32 = 0x2;
 //#define V4L2_CHIP_MATCH_AC97 3 /* Match against anciliary AC97 chip */
-pub static V4L2_CHIP_MATCH_AC97: c_ulong = 0x3;
+pub static V4L2_CHIP_MATCH_AC97: u32 = 0x3;
 //#define VIDIOC_QUERYCAP _IOR('V', 0, struct v4l2_capability)
-pub static VIDIOC_QUERYCAP: c_ulong = 0x80685600;
+pub static VIDIOC_QUERYCAP: u32 = 0x80685600;
 //#define VIDIOC_RESERVED _IO('V', 1)
-pub static VIDIOC_RESERVED: c_ulong = 0x5601;
+pub static VIDIOC_RESERVED: u32 = 0x5601;
 //#define VIDIOC_ENUM_FMT _IOWR('V', 2, struct v4l2_fmtdesc)
-pub static VIDIOC_ENUM_FMT: c_ulong = 0xc0405602;
+pub static VIDIOC_ENUM_FMT: u32 = 0xc0405602;
 //#define VIDIOC_G_FMT _IOWR('V', 4, struct v4l2_format)
-pub static VIDIOC_G_FMT: c_ulong = 0xc0d05604;
+pub static VIDIOC_G_FMT: u32 = 0xc0d05604;
 //#define VIDIOC_S_FMT _IOWR('V', 5, struct v4l2_format)
-pub static VIDIOC_S_FMT: c_ulong = 0xc0d05605;
+pub static VIDIOC_S_FMT: u32 = 0xc0d05605;
 //#define VIDIOC_REQBUFS _IOWR('V', 8, struct v4l2_requestbuffers)
-pub static VIDIOC_REQBUFS: c_ulong = 0xc0145608;
+pub static VIDIOC_REQBUFS: u32 = 0xc0145608;
 //#define VIDIOC_QUERYBUF _IOWR('V', 9, struct v4l2_buffer)
-pub static VIDIOC_QUERYBUF: c_ulong = 0xc0585609;
+pub static VIDIOC_QUERYBUF: u32 = 0xc0585609;
 //#define VIDIOC_G_FBUF _IOR('V', 10, struct v4l2_framebuffer)
-pub static VIDIOC_G_FBUF: c_ulong = 0x8030560a;
+pub static VIDIOC_G_FBUF: u32 = 0x8030560a;
 //#define VIDIOC_S_FBUF _IOW('V', 11, struct v4l2_framebuffer)
-pub static VIDIOC_S_FBUF: c_ulong = 0x4030560b;
+pub static VIDIOC_S_FBUF: u32 = 0x4030560b;
 //#define VIDIOC_OVERLAY _IOW('V', 14, int)
-pub static VIDIOC_OVERLAY: c_ulong = 0x4004560e;
+pub static VIDIOC_OVERLAY: u32 = 0x4004560e;
 //#define VIDIOC_QBUF _IOWR('V', 15, struct v4l2_buffer)
-pub static VIDIOC_QBUF: c_ulong = 0xc058560f;
+pub static VIDIOC_QBUF: u32 = 0xc058560f;
 //#define VIDIOC_DQBUF _IOWR('V', 17, struct v4l2_buffer)
-pub static VIDIOC_DQBUF: c_ulong = 0xc0585611;
+pub static VIDIOC_DQBUF: u32 = 0xc0585611;
 //#define VIDIOC_STREAMON _IOW('V', 18, int)
-pub static VIDIOC_STREAMON: c_ulong = 0x40045612;
+pub static VIDIOC_STREAMON: u32 = 0x40045612;
 //#define VIDIOC_STREAMOFF _IOW('V', 19, int)
-pub static VIDIOC_STREAMOFF: c_ulong = 0x40045613;
+pub static VIDIOC_STREAMOFF: u32 = 0x40045613;
 //#define VIDIOC_G_PARM _IOWR('V', 21, struct v4l2_streamparm)
-pub static VIDIOC_G_PARM: c_ulong = 0xc0cc5615;
+pub static VIDIOC_G_PARM: u32 = 0xc0cc5615;
 //#define VIDIOC_S_PARM _IOWR('V', 22, struct v4l2_streamparm)
-pub static VIDIOC_S_PARM: c_ulong = 0xc0cc5616;
+pub static VIDIOC_S_PARM: u32 = 0xc0cc5616;
 //#define VIDIOC_G_STD _IOR('V', 23, v4l2_std_id)
-pub static VIDIOC_G_STD: c_ulong = 0x80085617;
+pub static VIDIOC_G_STD: u32 = 0x80085617;
 //#define VIDIOC_S_STD _IOW('V', 24, v4l2_std_id)
-pub static VIDIOC_S_STD: c_ulong = 0x40085618;
+pub static VIDIOC_S_STD: u32 = 0x40085618;
 //#define VIDIOC_ENUMSTD _IOWR('V', 25, struct v4l2_standard)
-pub static VIDIOC_ENUMSTD: c_ulong = 0xc0485619;
+pub static VIDIOC_ENUMSTD: u32 = 0xc0485619;
 //#define VIDIOC_ENUMINPUT _IOWR('V', 26, struct v4l2_input)
-pub static VIDIOC_ENUMINPUT: c_ulong = 0xc050561a;
+pub static VIDIOC_ENUMINPUT: u32 = 0xc050561a;
 //#define VIDIOC_G_CTRL _IOWR('V', 27, struct v4l2_control)
-pub static VIDIOC_G_CTRL: c_ulong = 0xc008561b;
+pub static VIDIOC_G_CTRL: u32 = 0xc008561b;
 //#define VIDIOC_S_CTRL _IOWR('V', 28, struct v4l2_control)
-pub static VIDIOC_S_CTRL: c_ulong = 0xc008561c;
+pub static VIDIOC_S_CTRL: u32 = 0xc008561c;
 //#define VIDIOC_G_TUNER _IOWR('V', 29, struct v4l2_tuner)
-pub static VIDIOC_G_TUNER: c_ulong = 0xc054561d;
+pub static VIDIOC_G_TUNER: u32 = 0xc054561d;
 //#define VIDIOC_S_TUNER _IOW('V', 30, struct v4l2_tuner)
-pub static VIDIOC_S_TUNER: c_ulong = 0x4054561e;
+pub static VIDIOC_S_TUNER: u32 = 0x4054561e;
 //#define VIDIOC_G_AUDIO _IOR('V', 33, struct v4l2_audio)
-pub static VIDIOC_G_AUDIO: c_ulong = 0x80345621;
+pub static VIDIOC_G_AUDIO: u32 = 0x80345621;
 //#define VIDIOC_S_AUDIO _IOW('V', 34, struct v4l2_audio)
-pub static VIDIOC_S_AUDIO: c_ulong = 0x40345622;
+pub static VIDIOC_S_AUDIO: u32 = 0x40345622;
 //#define VIDIOC_QUERYCTRL _IOWR('V', 36, struct v4l2_queryctrl)
-pub static VIDIOC_QUERYCTRL: c_ulong = 0xc0445624;
+pub static VIDIOC_QUERYCTRL: u32 = 0xc0445624;
 //#define VIDIOC_QUERYMENU _IOWR('V', 37, struct v4l2_querymenu)
-pub static VIDIOC_QUERYMENU: c_ulong = 0xc02c5625;
+pub static VIDIOC_QUERYMENU: u32 = 0xc02c5625;
 //#define VIDIOC_G_INPUT _IOR('V', 38, int)
-pub static VIDIOC_G_INPUT: c_ulong = 0x80045626;
+pub static VIDIOC_G_INPUT: u32 = 0x80045626;
 //#define VIDIOC_S_INPUT _IOWR('V', 39, int)
-pub static VIDIOC_S_INPUT: c_ulong = 0xc0045627;
+pub static VIDIOC_S_INPUT: u32 = 0xc0045627;
 //#define VIDIOC_G_OUTPUT _IOR('V', 46, int)
-pub static VIDIOC_G_OUTPUT: c_ulong = 0x8004562e;
+pub static VIDIOC_G_OUTPUT: u32 = 0x8004562e;
 //#define VIDIOC_S_OUTPUT _IOWR('V', 47, int)
-pub static VIDIOC_S_OUTPUT: c_ulong = 0xc004562f;
+pub static VIDIOC_S_OUTPUT: u32 = 0xc004562f;
 //#define VIDIOC_ENUMOUTPUT _IOWR('V', 48, struct v4l2_output)
-pub static VIDIOC_ENUMOUTPUT: c_ulong = 0xc0485630;
+pub static VIDIOC_ENUMOUTPUT: u32 = 0xc0485630;
 //#define VIDIOC_G_AUDOUT _IOR('V', 49, struct v4l2_audioout)
-pub static VIDIOC_G_AUDOUT: c_ulong = 0x80345631;
+pub static VIDIOC_G_AUDOUT: u32 = 0x80345631;
 //#define VIDIOC_S_AUDOUT _IOW('V', 50, struct v4l2_audioout)
-pub static VIDIOC_S_AUDOUT: c_ulong = 0x40345632;
+pub static VIDIOC_S_AUDOUT: u32 = 0x40345632;
 //#define VIDIOC_G_MODULATOR _IOWR('V', 54, struct v4l2_modulator)
-pub static VIDIOC_G_MODULATOR: c_ulong = 0xc0445636;
+pub static VIDIOC_G_MODULATOR: u32 = 0xc0445636;
 //#define VIDIOC_S_MODULATOR _IOW('V', 55, struct v4l2_modulator)
-pub static VIDIOC_S_MODULATOR: c_ulong = 0x40445637;
+pub static VIDIOC_S_MODULATOR: u32 = 0x40445637;
 //#define VIDIOC_G_FREQUENCY _IOWR('V', 56, struct v4l2_frequency)
-pub static VIDIOC_G_FREQUENCY: c_ulong = 0xc02c5638;
+pub static VIDIOC_G_FREQUENCY: u32 = 0xc02c5638;
 //#define VIDIOC_S_FREQUENCY _IOW('V', 57, struct v4l2_frequency)
-pub static VIDIOC_S_FREQUENCY: c_ulong = 0x402c5639;
+pub static VIDIOC_S_FREQUENCY: u32 = 0x402c5639;
 //#define VIDIOC_CROPCAP _IOWR('V', 58, struct v4l2_cropcap)
-pub static VIDIOC_CROPCAP: c_ulong = 0xc02c563a;
+pub static VIDIOC_CROPCAP: u32 = 0xc02c563a;
 //#define VIDIOC_G_CROP _IOWR('V', 59, struct v4l2_crop)
-pub static VIDIOC_G_CROP: c_ulong = 0xc014563b;
+pub static VIDIOC_G_CROP: u32 = 0xc014563b;
 //#define VIDIOC_S_CROP _IOW('V', 60, struct v4l2_crop)
-pub static VIDIOC_S_CROP: c_ulong = 0x4014563c;
+pub static VIDIOC_S_CROP: u32 = 0x4014563c;
 //#define VIDIOC_G_JPEGCOMP _IOR('V', 61, struct v4l2_jpegcompression)
-pub static VIDIOC_G_JPEGCOMP: c_ulong = 0x808c563d;
+pub static VIDIOC_G_JPEGCOMP: u32 = 0x808c563d;
 //#define VIDIOC_S_JPEGCOMP _IOW('V', 62, struct v4l2_jpegcompression)
-pub static VIDIOC_S_JPEGCOMP: c_ulong = 0x408c563e;
+pub static VIDIOC_S_JPEGCOMP: u32 = 0x408c563e;
 //#define VIDIOC_QUERYSTD _IOR('V', 63, v4l2_std_id)
-pub static VIDIOC_QUERYSTD: c_ulong = 0x8008563f;
+pub static VIDIOC_QUERYSTD: u32 = 0x8008563f;
 //#define VIDIOC_TRY_FMT _IOWR('V', 64, struct v4l2_format)
-pub static VIDIOC_TRY_FMT: c_ulong = 0xc0d05640;
+pub static VIDIOC_TRY_FMT: u32 = 0xc0d05640;
 //#define VIDIOC_ENUMAUDIO _IOWR('V', 65, struct v4l2_audio)
-pub static VIDIOC_ENUMAUDIO: c_ulong = 0xc0345641;
+pub static VIDIOC_ENUMAUDIO: u32 = 0xc0345641;
 //#define VIDIOC_ENUMAUDOUT _IOWR('V', 66, struct v4l2_audioout)
-pub static VIDIOC_ENUMAUDOUT: c_ulong = 0xc0345642;
+pub static VIDIOC_ENUMAUDOUT: u32 = 0xc0345642;
 //#define VIDIOC_G_PRIORITY _IOR('V', 67, __u32) /* enum v4l2_priority */
-pub static VIDIOC_G_PRIORITY: c_ulong = 0x80045643;
+pub static VIDIOC_G_PRIORITY: u32 = 0x80045643;
 //#define VIDIOC_S_PRIORITY _IOW('V', 68, __u32) /* enum v4l2_priority */
-pub static VIDIOC_S_PRIORITY: c_ulong = 0x40045644;
+pub static VIDIOC_S_PRIORITY: u32 = 0x40045644;
 //#define VIDIOC_G_SLICED_VBI_CAP _IOWR('V', 69, struct v4l2_sliced_vbi_cap)
-pub static VIDIOC_G_SLICED_VBI_CAP: c_ulong = 0xc0745645;
+pub static VIDIOC_G_SLICED_VBI_CAP: u32 = 0xc0745645;
 //#define VIDIOC_LOG_STATUS _IO('V', 70)
-pub static VIDIOC_LOG_STATUS: c_ulong = 0x5646;
+pub static VIDIOC_LOG_STATUS: u32 = 0x5646;
 //#define VIDIOC_G_EXT_CTRLS _IOWR('V', 71, struct v4l2_ext_controls)
-pub static VIDIOC_G_EXT_CTRLS: c_ulong = 0xc0205647;
+pub static VIDIOC_G_EXT_CTRLS: u32 = 0xc0205647;
 //#define VIDIOC_S_EXT_CTRLS _IOWR('V', 72, struct v4l2_ext_controls)
-pub static VIDIOC_S_EXT_CTRLS: c_ulong = 0xc0205648;
+pub static VIDIOC_S_EXT_CTRLS: u32 = 0xc0205648;
 //#define VIDIOC_TRY_EXT_CTRLS _IOWR('V', 73, struct v4l2_ext_controls)
-pub static VIDIOC_TRY_EXT_CTRLS: c_ulong = 0xc0205649;
+pub static VIDIOC_TRY_EXT_CTRLS: u32 = 0xc0205649;
 //#define VIDIOC_ENUM_FRAMESIZES _IOWR('V', 74, struct v4l2_frmsizeenum)
-pub static VIDIOC_ENUM_FRAMESIZES: c_ulong = 0xc02c564a;
+pub static VIDIOC_ENUM_FRAMESIZES: u32 = 0xc02c564a;
 //#define VIDIOC_ENUM_FRAMEINTERVALS _IOWR('V', 75, struct v4l2_frmivalenum)
-pub static VIDIOC_ENUM_FRAMEINTERVALS: c_ulong = 0xc034564b;
+pub static VIDIOC_ENUM_FRAMEINTERVALS: u32 = 0xc034564b;
 //#define VIDIOC_G_ENC_INDEX _IOR('V', 76, struct v4l2_enc_idx)
-pub static VIDIOC_G_ENC_INDEX: c_ulong = 0x8818564c;
+pub static VIDIOC_G_ENC_INDEX: u32 = 0x8818564c;
 //#define VIDIOC_ENCODER_CMD _IOWR('V', 77, struct v4l2_encoder_cmd)
-pub static VIDIOC_ENCODER_CMD: c_ulong = 0xc028564d;
+pub static VIDIOC_ENCODER_CMD: u32 = 0xc028564d;
 //#define VIDIOC_TRY_ENCODER_CMD _IOWR('V', 78, struct v4l2_encoder_cmd)
-pub static VIDIOC_TRY_ENCODER_CMD: c_ulong = 0xc028564e;
+pub static VIDIOC_TRY_ENCODER_CMD: u32 = 0xc028564e;
 //#define VIDIOC_DBG_S_REGISTER _IOW('V', 79, struct v4l2_dbg_register)
-pub static VIDIOC_DBG_S_REGISTER: c_ulong = 0x4038564f;
+pub static VIDIOC_DBG_S_REGISTER: u32 = 0x4038564f;
 //#define VIDIOC_DBG_G_REGISTER _IOWR('V', 80, struct v4l2_dbg_register)
-pub static VIDIOC_DBG_G_REGISTER: c_ulong = 0xc0385650;
+pub static VIDIOC_DBG_G_REGISTER: u32 = 0xc0385650;
 //#define VIDIOC_DBG_G_CHIP_IDENT _IOWR('V', 81, struct v4l2_dbg_chip_ident)
-pub static VIDIOC_DBG_G_CHIP_IDENT: c_ulong = 0xc02c5651;
+pub static VIDIOC_DBG_G_CHIP_IDENT: u32 = 0xc02c5651;
 //#define VIDIOC_S_HW_FREQ_SEEK _IOW('V', 82, struct v4l2_hw_freq_seek)
-pub static VIDIOC_S_HW_FREQ_SEEK: c_ulong = 0x40305652;
+pub static VIDIOC_S_HW_FREQ_SEEK: u32 = 0x40305652;
 //#define VIDIOC_ENUM_DV_PRESETS _IOWR('V', 83, struct v4l2_dv_enum_preset)
-pub static VIDIOC_ENUM_DV_PRESETS: c_ulong = 0xc0405653;
+pub static VIDIOC_ENUM_DV_PRESETS: u32 = 0xc0405653;
 //#define VIDIOC_S_DV_PRESET _IOWR('V', 84, struct v4l2_dv_preset)
-pub static VIDIOC_S_DV_PRESET: c_ulong = 0xc0145654;
+pub static VIDIOC_S_DV_PRESET: u32 = 0xc0145654;
 //#define VIDIOC_G_DV_PRESET _IOWR('V', 85, struct v4l2_dv_preset)
-pub static VIDIOC_G_DV_PRESET: c_ulong = 0xc0145655;
+pub static VIDIOC_G_DV_PRESET: u32 = 0xc0145655;
 //#define VIDIOC_QUERY_DV_PRESET _IOR('V', 86, struct v4l2_dv_preset)
-pub static VIDIOC_QUERY_DV_PRESET: c_ulong = 0x80145656;
+pub static VIDIOC_QUERY_DV_PRESET: u32 = 0x80145656;
 //#define VIDIOC_S_DV_TIMINGS _IOWR('V', 87, struct v4l2_dv_timings)
-pub static VIDIOC_S_DV_TIMINGS: c_ulong = 0xc0845657;
+pub static VIDIOC_S_DV_TIMINGS: u32 = 0xc0845657;
 //#define VIDIOC_G_DV_TIMINGS _IOWR('V', 88, struct v4l2_dv_timings)
-pub static VIDIOC_G_DV_TIMINGS: c_ulong = 0xc0845658;
+pub static VIDIOC_G_DV_TIMINGS: u32 = 0xc0845658;
 //#define VIDIOC_DQEVENT _IOR('V', 89, struct v4l2_event)
-pub static VIDIOC_DQEVENT: c_ulong = 0x80885659;
+pub static VIDIOC_DQEVENT: u32 = 0x80885659;
 //#define VIDIOC_SUBSCRIBE_EVENT _IOW('V', 90, struct v4l2_event_subscription)
-pub static VIDIOC_SUBSCRIBE_EVENT: c_ulong = 0x4020565a;
+pub static VIDIOC_SUBSCRIBE_EVENT: u32 = 0x4020565a;
 //#define VIDIOC_UNSUBSCRIBE_EVENT _IOW('V', 91, struct v4l2_event_subscription)
-pub static VIDIOC_UNSUBSCRIBE_EVENT: c_ulong = 0x4020565b;
+pub static VIDIOC_UNSUBSCRIBE_EVENT: u32 = 0x4020565b;
 //#define VIDIOC_CREATE_BUFS _IOWR('V', 92, struct v4l2_create_buffers)
-pub static VIDIOC_CREATE_BUFS: c_ulong = 0xc100565c;
+pub static VIDIOC_CREATE_BUFS: u32 = 0xc100565c;
 //#define VIDIOC_PREPARE_BUF _IOWR('V', 93, struct v4l2_buffer)
-pub static VIDIOC_PREPARE_BUF: c_ulong = 0xc058565d;
+pub static VIDIOC_PREPARE_BUF: u32 = 0xc058565d;
 //#define VIDIOC_G_SELECTION _IOWR('V', 94, struct v4l2_selection)
-pub static VIDIOC_G_SELECTION: c_ulong = 0xc040565e;
+pub static VIDIOC_G_SELECTION: u32 = 0xc040565e;
 //#define VIDIOC_S_SELECTION _IOWR('V', 95, struct v4l2_selection)
-pub static VIDIOC_S_SELECTION: c_ulong = 0xc040565f;
+pub static VIDIOC_S_SELECTION: u32 = 0xc040565f;
 //#define VIDIOC_DECODER_CMD _IOWR('V', 96, struct v4l2_decoder_cmd)
-pub static VIDIOC_DECODER_CMD: c_ulong = 0xc0485660;
+pub static VIDIOC_DECODER_CMD: u32 = 0xc0485660;
 //#define VIDIOC_TRY_DECODER_CMD _IOWR('V', 97, struct v4l2_decoder_cmd)
-pub static VIDIOC_TRY_DECODER_CMD: c_ulong = 0xc0485661;
+pub static VIDIOC_TRY_DECODER_CMD: u32 = 0xc0485661;
 //#define VIDIOC_ENUM_DV_TIMINGS _IOWR('V', 98, struct v4l2_enum_dv_timings)
-pub static VIDIOC_ENUM_DV_TIMINGS: c_ulong = 0xc0945662;
+pub static VIDIOC_ENUM_DV_TIMINGS: u32 = 0xc0945662;
 //#define VIDIOC_QUERY_DV_TIMINGS _IOR('V', 99, struct v4l2_dv_timings)
-pub static VIDIOC_QUERY_DV_TIMINGS: c_ulong = 0x80845663;
+pub static VIDIOC_QUERY_DV_TIMINGS: u32 = 0x80845663;
 //#define VIDIOC_DV_TIMINGS_CAP _IOWR('V', 100, struct v4l2_dv_timings_cap)
-pub static VIDIOC_DV_TIMINGS_CAP: c_ulong = 0xc0905664;
+pub static VIDIOC_DV_TIMINGS_CAP: u32 = 0xc0905664;
 //#define VIDIOC_ENUM_FREQ_BANDS _IOWR('V', 101, struct v4l2_frequency_band)
-pub static VIDIOC_ENUM_FREQ_BANDS: c_ulong = 0xc0405665;
+pub static VIDIOC_ENUM_FREQ_BANDS: u32 = 0xc0405665;
 //#define BASE_VIDIOC_PRIVATE 192 /* 192-255 are private */
-pub static BASE_VIDIOC_PRIVATE: c_ulong = 0xc0;
+pub static BASE_VIDIOC_PRIVATE: u32 = 0xc0;
 
 pub type v4l2_field = c_uint;
 pub static V4L2_FIELD_ANY: c_uint = 0;
@@ -1039,12 +1040,14 @@ pub static V4L2_PRIORITY_BACKGROUND: c_uint = 1;
 pub static V4L2_PRIORITY_INTERACTIVE: c_uint = 2;
 pub static V4L2_PRIORITY_RECORD: c_uint = 3;
 pub static V4L2_PRIORITY_DEFAULT: c_uint = 2;
+#[deriving(Default)]
 pub struct v4l2_rect {
     left: i32,
     top: i32,
     width: i32,
     height: i32,
 }
+#[deriving(Default)]
 pub struct v4l2_fract {
     numerator: u32,
     denominator: u32,
@@ -1071,6 +1074,7 @@ impl Default for v4l2_capability {
         }
     }
 }
+#[deriving(Default)]
 pub struct v4l2_pix_format {
     width: u32,
     height: u32,
@@ -1088,15 +1092,17 @@ pub struct v4l2_fmtdesc {
     description: [u8, ..32u],
     pixelformat: u32,
     reserved: [u32, ..4u],
-}
+} // TODO: implement Default
 pub type v4l2_frmsizetypes = c_uint;
 pub static V4L2_FRMSIZE_TYPE_DISCRETE: c_uint = 1;
 pub static V4L2_FRMSIZE_TYPE_CONTINUOUS: c_uint = 2;
 pub static V4L2_FRMSIZE_TYPE_STEPWISE: c_uint = 3;
+#[deriving(Default)]
 pub struct v4l2_frmsize_discrete {
     width: u32,
     height: u32,
 }
+#[deriving(Default)]
 pub struct v4l2_frmsize_stepwise {
     min_width: u32,
     max_width: u32,
@@ -1256,12 +1262,14 @@ pub struct v4l2_outputparm {
     writebuffers: u32,
     reserved: [u32, ..4u],
 }
+#[deriving(Default)]
 pub struct v4l2_cropcap {
     _type: u32,
     bounds: v4l2_rect,
     defrect: v4l2_rect,
     pixelaspect: v4l2_fract,
 }
+#[deriving(Default)]
 pub struct v4l2_crop {
     _type: u32,
     c: v4l2_rect,
@@ -1645,6 +1653,7 @@ pub struct v4l2_pix_format_mplane {
     num_planes: u8,
     reserved: [u8, ..11u],
 }
+#[deriving(Default)]
 pub struct v4l2_format {
     _type: u32,
     fmt: union16,
@@ -1670,6 +1679,13 @@ impl union16 {
     }
     pub fn raw_data(&mut self) -> *mut [u8, ..200u] {
         unsafe { ::std::cast::transmute(self) }
+    }
+}
+impl Default for union16 {
+    fn default() -> union16 {
+        union16 {
+            data: [Default::default(), ..25u],
+        }
     }
 }
 pub struct v4l2_streamparm {
@@ -1782,5 +1798,16 @@ pub struct v4l2_create_buffers {
 }
 #[link(name = "xioctl")]
 extern {
-    pub fn xioctl(fd: c_int, req: c_ulong, arg: *mut c_void) -> c_int;
+    fn xioctl(fd: c_int, req: c_ulong, arg: *mut c_void) -> c_int;
+}
+
+pub fn v4l2_ioctl(fd: c_int, req: u32, arg: *mut c_void) -> Result<c_int, c_int> {
+    let result = unsafe {
+        xioctl(fd, req as u64, arg)
+    };
+    if result == -1 {
+        Err(errno() as c_int)
+    } else {
+        Ok(result)
+    }
 }
