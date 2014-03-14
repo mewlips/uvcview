@@ -4,18 +4,25 @@ use std::default::Default;
 use std::fmt;
 use std::io::{IoResult,IoError,OtherIoError,TypeUnknown,MismatchedFileTypeForOperation};
 use std::io;
-use std::libc::consts::os::posix88::{EINVAL};
+use std::libc::consts::os::posix88::{EINVAL,MAP_SHARED};
 use std::libc::{c_int,O_RDWR};
 use std::libc;
 use std::os;
+use std::os::{MemoryMap,MapReadable,MapWritable,MapFd,MapNonStandardFlags};
 use v4l2;
 use v4l2::{v4l2_capability,v4l2_crop,v4l2_cropcap,v4l2_format,v4l2_ioctl};
+
+struct Buffer {
+    memory_map: MemoryMap,
+    length: u32,
+}
 
 pub struct UvcView {
     device_path: Path,
     fd: c_int,
     width: u32,
     height: u32,
+    buffers: ~[Buffer],
 }
 
 impl Default for UvcView {
@@ -25,6 +32,7 @@ impl Default for UvcView {
             fd: -1,
             width: 640,
             height: 480,
+            buffers: ~[],
         }
     }
 }
@@ -36,8 +44,7 @@ impl fmt::Show for UvcView {
     }
 }
 
-pub fn errno_msg() -> ~str {
-    let errno = os::errno();
+pub fn errno_msg(errno: int) -> ~str {
     let err_msg = unsafe {
         CString::new(libc::strerror(errno as c_int), false)
             .as_str().unwrap_or("unknown error");
@@ -71,7 +78,7 @@ impl UvcView {
                 return Err(IoError {
                     kind: io::OtherIoError,
                     desc: "open() failed",
-                    detail: Some(errno_msg())
+                    detail: Some(errno_msg(os::errno()))
                 });
             }
             fd => {
@@ -111,7 +118,7 @@ impl UvcView {
                     return Err(IoError {
                         kind: io::OtherIoError,
                         desc: "init(): ioctl() returns -1",
-                        detail: Some(errno_msg())
+                        detail: Some(errno_msg(e as int))
                     });
                 }
             }
@@ -155,11 +162,11 @@ impl UvcView {
 
         match v4l2_ioctl(self.fd, v4l2::VIDIOC_S_FMT, unsafe { transmute(&mut fmt) }) {
             Ok(_) => {}
-            Err(_) => {
+            Err(errno) => {
                 return Err(IoError {
                     kind: io::OtherIoError,
                     desc: "init(): ioctl() returns -1",
-                    detail: Some(errno_msg())
+                    detail: Some(errno_msg(errno as int))
                 });
             }
         }
@@ -183,6 +190,81 @@ impl UvcView {
             if (*pix).height != self.height {
                 self.height = (*pix).height;
             }
+        }
+
+        // mmap initialization
+
+        let mut req: v4l2::v4l2_requestbuffers = Default::default();
+
+        req.count = 4;
+        req._type = v4l2::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        req.memory = v4l2::V4L2_MEMORY_MMAP;
+
+        match v4l2_ioctl(self.fd, v4l2::VIDIOC_REQBUFS, unsafe { transmute(&mut req) }) {
+            Ok(_) => {}
+            Err(errno) => {
+                if errno == EINVAL {
+                    return Err(IoError {
+                        kind: io::OtherIoError,
+                        desc: "init(): ioctl() returns -1",
+                        detail: Some(format!("{} does not support memory mapping",
+                                     self.device_path.display()))
+                    });
+                } else {
+                    return Err(IoError {
+                        kind: io::OtherIoError,
+                        desc: "init(): ioctl() returns -1",
+                        detail: Some(errno_msg(errno as int))
+                    });
+                }
+            }
+        }
+
+        if req.count < 2 {
+            return Err(IoError {
+                kind: io::OtherIoError,
+                desc: "init() error",
+                detail: Some(format!("Insufficient buffer memory on {}", self.device_path.display()))
+            });
+        }
+
+        let mut count = 0;
+        while count < req.count {
+            let mut buf: v4l2::v4l2_buffer = Default::default();
+            buf._type = v4l2::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            buf.memory = v4l2::V4L2_MEMORY_MMAP;
+            buf.index = count;
+
+            match v4l2_ioctl(self.fd, v4l2::VIDIOC_QUERYBUF, unsafe { transmute(&mut buf) }) {
+                Ok(_) => {}
+                Err(errno) => {
+                    return Err(IoError {
+                        kind: io::OtherIoError,
+                        desc: "init() error",
+                        detail: Some(errno_msg(errno as int)),
+                    });
+                }
+            }
+
+            match MemoryMap::new(buf.length as uint,
+                                 &[MapReadable, MapWritable, MapFd(self.fd),
+                                   MapNonStandardFlags(MAP_SHARED)]) {
+                Ok(m) => {
+                    self.buffers.push(Buffer {
+                        memory_map: m,
+                        length: buf.length
+                    });
+                }
+                Err(e) => {
+                    return Err(IoError {
+                        kind: io::OtherIoError,
+                        desc: "init() error",
+                        detail: Some(format!("MemoryMap::new() failed. {}", e))
+                    });
+                }
+            }
+
+            count += 1;
         }
 
         return Ok(self);

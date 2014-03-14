@@ -1,4 +1,5 @@
 extern crate getopts;
+extern crate sdl;
 
 use getopts::{getopts,optopt,optflag,usage};
 use std::default::Default;
@@ -62,9 +63,9 @@ pub fn main() {
         from_str::<u32>(s).unwrap_or_else(|| { fail!("invalid option argument") })
     });
 
-    match uvcview.open().and_then(|v| {
-                v.init()
-          }) {
+    match uvcview.open().and_then(|uvcview| {
+          uvcview.init()
+    }) {
         Ok(_) => {
             info!("{}", uvcview);
             info!("success");
@@ -74,6 +75,17 @@ pub fn main() {
             fail!("{}", e);
         }
     }
+
+    match sdl::init(&[sdl::InitVideo]) {
+        true => {}
+        false => {
+            fail!("sdl::init() failed");
+        }
+    }
+
+    sdl::wm::set_caption("uvcview", "uvcview");
+
+    // TODO
 }
 
 
