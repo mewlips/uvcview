@@ -296,6 +296,17 @@ impl UvcView {
             }
         }
     }
+
+    pub fn stop_capturing(&mut self) {
+        let mut buf_type: v4l2::v4l2_buf_type = v4l2::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+        match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_STREAMOFF, unsafe { transmute(&mut buf_type) }) {
+            Ok(_) => {}
+            Err(e) => {
+                fail!("VIDIOC_STREAMOFF failed. {}", e);
+            }
+        }
+    }
 }
 
 impl Drop for UvcView {

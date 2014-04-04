@@ -100,7 +100,11 @@ pub fn main() {
     };
 
     uvcview.start_capturing();
-    // TODO:
+    main_loop(&mut uvcview);
+    uvcview.stop_capturing();
 }
 
+fn main_loop(uvcview: &mut UvcView) {
+    // TODO:
+}
 
