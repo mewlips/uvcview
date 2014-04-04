@@ -13,16 +13,16 @@ use v4l2;
 use v4l2::{v4l2_capability,v4l2_crop,v4l2_cropcap,v4l2_format,v4l2_ioctl};
 
 struct Buffer {
-    memory_map: MemoryMap,
-    length: u32,
+    pub memory_map: MemoryMap,
+    pub length: u32,
 }
 
 pub struct UvcView {
-    device_path: Path,
-    fd: c_int,
-    width: u32,
-    height: u32,
-    buffers: ~[Buffer],
+    pub device_path: Path,
+    pub fd: c_int,
+    pub width: u32,
+    pub height: u32,
+    pub buffers: Vec<Buffer>,
 }
 
 impl Default for UvcView {
@@ -32,7 +32,7 @@ impl Default for UvcView {
             fd: -1,
             width: 640,
             height: 480,
-            buffers: ~[],
+            buffers: vec!(),
         }
     }
 }
@@ -268,5 +268,42 @@ impl UvcView {
         }
 
         return Ok(self);
+    }
+
+    pub fn start_capturing(&mut self) {
+        let mut i = 0;
+        for _ in self.buffers.iter() {
+            let mut buf: v4l2::v4l2_buffer = Default::default();
+            buf._type = v4l2::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            buf.memory = v4l2::V4L2_MEMORY_MMAP;
+            buf.index = i;
+
+            match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_QBUF, unsafe { transmute(&mut buf) }) {
+                Ok(_) => {}
+                Err(e) => {
+                    fail!("VIDIOC_QBUF failed. {}", e);
+                }
+            }
+
+            i = i + 1;
+        }
+
+        let mut buf_type: v4l2::v4l2_buf_type = Default::default();
+        match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_STREAMON, unsafe { transmute(&mut buf_type) }) {
+            Ok(_) => {}
+            Err(e) => {
+                fail!("VIDIOC_STERAMON failed. {}", e);
+            }
+        }
+    }
+}
+
+impl Drop for UvcView {
+    fn drop(&mut self) {
+        if self.fd != -1 {
+            unsafe {
+                libc::close(self.fd);
+            }
+        }
     }
 }

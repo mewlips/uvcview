@@ -1,5 +1,9 @@
+#![feature(phase)]
+
 extern crate getopts;
 extern crate sdl;
+#[phase(syntax, link)]
+extern crate log;
 
 use getopts::{getopts,optopt,optflag,usage};
 use std::default::Default;
@@ -19,7 +23,7 @@ pub fn main() {
 
     let opts = ~[
         optopt("d", "device", format!("set video device path (default: {})",
-                                      uvcview.device_path.as_str()),
+                              uvcview.device_path.as_str().unwrap_or("<None>")),
                "<device_path>"),
         optopt("x", "width", format!("set width (default: {})",
                                      uvcview.width),
@@ -85,7 +89,18 @@ pub fn main() {
 
     sdl::wm::set_caption("uvcview", "uvcview");
 
-    // TODO
+    let width = uvcview.width as uint;
+    let height = uvcview.height as uint;
+    let surface = match sdl::video::Surface::new(
+                            &[sdl::video::HWSurface],
+                            width as int, height as int, 24,
+                            0xff, 0xff00, 0xff0000, 0) {
+        Ok(surface) => surface,
+        Err(err) => fail!("Surface::new() failed. {}", err)
+    };
+
+    uvcview.start_capturing();
+    // TODO:
 }
 
 
