@@ -2,13 +2,18 @@
 
 extern crate getopts;
 extern crate sdl;
+extern crate libc;
 #[phase(syntax, link)]
 extern crate log;
 
 use getopts::{getopts,optopt,optflag,usage};
+use libc::consts::os::c95::EXIT_FAILURE;
+use libc::consts::os::posix88::{EINTR};
+use std::cast::{transmute};
 use std::default::Default;
-use std::libc::consts::os::c95::EXIT_FAILURE;
+use std::mem;
 use std::os;
+use std::ptr::{null};
 use uvcview::UvcView;
 
 mod v4l2;
@@ -105,6 +110,60 @@ pub fn main() {
 }
 
 fn main_loop(uvcview: &mut UvcView) {
-    // TODO:
+    loop {
+        match sdl::event::poll_event() {
+            sdl::event::QuitEvent => {
+                return;
+            }
+            _ => {
+            }
+        }
+        loop {
+            let mut set: fd_set = unsafe { mem::init() };
+            let mut tv = libc::timeval { tv_sec: 2, tv_usec: 0 };
+
+            fd_set(&mut set, uvcview.fd);
+
+            let result = unsafe {
+                select(uvcview.fd + 1, transmute(&mut set),
+                       null(), null(), transmute(&mut tv))
+            };
+            match result {
+                -1 => {
+                    if os::errno() == EINTR as int {
+                        continue
+                    }
+                    fail!("select() failed");
+                }
+                0 => {
+                    fail!("select() timeout");
+                }
+                _ => {
+                    if uvcview.read_frame() {
+                        break;
+                    }
+
+                    // EAGAIN - continue select loop
+                }
+            }
+        }
+    }
 }
 
+pub static FD_SETSIZE: uint = 1024;
+
+pub struct fd_set {
+    fds_bits: [u64, ..(FD_SETSIZE / 64)]
+}
+
+pub fn fd_set(set: &mut fd_set, fd: i32) {
+    set.fds_bits[(fd / 64) as uint] |= (1 << (fd % 64)) as u64;
+}
+
+extern {
+    pub fn select(nfds: libc::c_int,
+                  readfds: *fd_set,
+                  writefds: *fd_set,
+                  errorfds: *fd_set,
+                  timeout: *libc::timeval) -> libc::c_int;
+}

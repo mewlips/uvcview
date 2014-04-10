@@ -4,9 +4,9 @@ use std::default::Default;
 use std::fmt;
 use std::io::{IoResult,IoError,OtherIoError,TypeUnknown,MismatchedFileTypeForOperation};
 use std::io;
-use std::libc::consts::os::posix88::{EINVAL,MAP_SHARED};
-use std::libc::{c_int,O_RDWR};
-use std::libc;
+use libc::consts::os::posix88::{EINVAL,MAP_SHARED,EAGAIN};
+use libc::{c_int,O_RDWR};
+use libc;
 use std::os;
 use std::os::{MemoryMap,MapReadable,MapWritable,MapFd,MapNonStandardFlags};
 use v4l2;
@@ -49,7 +49,7 @@ pub fn errno_msg(errno: int) -> ~str {
         CString::new(libc::strerror(errno as c_int), false)
             .as_str().unwrap_or("unknown error");
     };
-    format!("{} ({}", err_msg, errno)
+    format!("{} ({})", err_msg, errno)
 }
 
 impl UvcView {
@@ -288,11 +288,12 @@ impl UvcView {
             i = i + 1;
         }
 
-        let mut buf_type: v4l2::v4l2_buf_type = Default::default();
+        let mut buf_type: v4l2::v4l2_buf_type = v4l2::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
         match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_STREAMON, unsafe { transmute(&mut buf_type) }) {
             Ok(_) => {}
             Err(e) => {
-                fail!("VIDIOC_STERAMON failed. {}", e);
+                fail!("VIDIOC_STERAMON failed. {}", errno_msg(e as int));
             }
         }
     }
@@ -303,9 +304,44 @@ impl UvcView {
         match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_STREAMOFF, unsafe { transmute(&mut buf_type) }) {
             Ok(_) => {}
             Err(e) => {
-                fail!("VIDIOC_STREAMOFF failed. {}", e);
+                fail!("VIDIOC_STREAMOFF failed. {}", errno_msg(e as int));
             }
         }
+    }
+
+    pub fn read_frame(&mut self) -> bool {
+        let mut buffer: v4l2::v4l2_buffer = Default::default();
+
+        buffer._type = v4l2::V4L2_BUF_TYPE_VIDEO_CAPTURE;
+        buffer.memory = v4l2::V4L2_MEMORY_MMAP;
+
+        match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_DQBUF, unsafe { transmute(&mut buffer) }) {
+            Ok(_) => {}
+            Err(EAGAIN) => {
+                return false;
+            }
+            Err(e) => {
+                fail!("VIDIOC_DQBUF failed. {}", errno_msg(e as int));
+            }
+        }
+
+        if buffer.index >= self.buffers.len() as u32 {
+            fail!();
+        }
+
+        self.process_image(buffer.index);
+
+        match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_QBUF, unsafe { transmute(&mut buffer) }) {
+            Ok(_) => {}
+            Err(e) => {
+                fail!("VIDIOC_QBUF failed. {}", errno_msg(e as int));
+            }
+        }
+        return true;
+    }
+
+    pub fn process_image(&mut self, buffer_index: u32) {
+        println!("buffer_index = {}", buffer_index);
     }
 }
 
