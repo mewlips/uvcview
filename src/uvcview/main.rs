@@ -96,13 +96,21 @@ pub fn main() {
 
     let width = uvcview.width as uint;
     let height = uvcview.height as uint;
-    let surface = match sdl::video::Surface::new(
+/*    let surface = match sdl::video::Surface::new(
                             &[sdl::video::HWSurface],
                             width as int, height as int, 24,
                             0xff, 0xff00, 0xff0000, 0) {
         Ok(surface) => surface,
         Err(err) => fail!("Surface::new() failed. {}", err)
     };
+    */
+    let surface = match sdl::video::set_video_mode(
+            width as int, height as int, 24,
+            [sdl::video::HWSurface], [sdl::video::DoubleBuf]) {
+        Ok(surface) => surface,
+        Err(err) => fail!("sdl::video::set_video_mode() failed! {}", err)
+    };
+    uvcview.set_surface(surface);
 
     uvcview.start_capturing();
     main_loop(&mut uvcview);

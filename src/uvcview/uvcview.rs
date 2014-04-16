@@ -1,12 +1,15 @@
-use std::c_str::CString;
+use libc::consts::os::posix88::{EINVAL,EIO,MAP_SHARED,EAGAIN};
+use libc::{c_int,O_RDWR};
+use libc;
 use std::cast::transmute;
+use std::cmp::{min,max};
 use std::default::Default;
 use std::fmt;
 use std::io::{IoResult,IoError,OtherIoError,TypeUnknown,MismatchedFileTypeForOperation};
 use std::io;
-use libc::consts::os::posix88::{EINVAL,MAP_SHARED,EAGAIN};
-use libc::{c_int,O_RDWR};
-use libc;
+use std::os::error_string;
+use std::ptr::copy_memory;
+use sdl;
 use std::os;
 use std::os::{MemoryMap,MapReadable,MapWritable,MapFd,MapNonStandardFlags};
 use v4l2;
@@ -23,6 +26,7 @@ pub struct UvcView {
     pub width: u32,
     pub height: u32,
     pub buffers: Vec<Buffer>,
+    pub surface: Option<~sdl::video::Surface>,
 }
 
 impl Default for UvcView {
@@ -30,9 +34,10 @@ impl Default for UvcView {
         UvcView {
             device_path: Path::new("/dev/video0"),
             fd: -1,
-            width: 640,
-            height: 480,
+            width: 1280,
+            height: 720,
             buffers: vec!(),
+            surface: None,
         }
     }
 }
@@ -42,14 +47,6 @@ impl fmt::Show for UvcView {
         write!(f.buf, "device_path : {}\nfd : {}\nwidth : {}\nheight : {}",
                self.device_path.display(), self.fd, self.width, self.height)
     }
-}
-
-pub fn errno_msg(errno: int) -> ~str {
-    let err_msg = unsafe {
-        CString::new(libc::strerror(errno as c_int), false)
-            .as_str().unwrap_or("unknown error");
-    };
-    format!("{} ({})", err_msg, errno)
 }
 
 impl UvcView {
@@ -78,7 +75,7 @@ impl UvcView {
                 return Err(IoError {
                     kind: io::OtherIoError,
                     desc: "open() failed",
-                    detail: Some(errno_msg(os::errno()))
+                    detail: Some(error_string(os::errno() as uint))
                 });
             }
             fd => {
@@ -118,7 +115,7 @@ impl UvcView {
                     return Err(IoError {
                         kind: io::OtherIoError,
                         desc: "init(): ioctl() returns -1",
-                        detail: Some(errno_msg(e as int))
+                        detail: Some(error_string(e as uint))
                     });
                 }
             }
@@ -166,7 +163,7 @@ impl UvcView {
                 return Err(IoError {
                     kind: io::OtherIoError,
                     desc: "init(): ioctl() returns -1",
-                    detail: Some(errno_msg(errno as int))
+                    detail: Some(error_string(errno as uint))
                 });
             }
         }
@@ -192,6 +189,16 @@ impl UvcView {
             }
         }
 
+        let mut frmsize: v4l2::v4l2_frmivalenum = Default::default();
+
+        match v4l2_ioctl(self.fd, v4l2::VIDIOC_ENUM_FRAMEINTERVALS, unsafe { transmute(&mut frmsize) }) {
+            Ok(_) => {}
+            Err(e) => {
+                fail!("VIDIOC_ENUM_FRAMEINTERVALS failed! {}");
+            }
+        }
+        println!("frmsize.he = {}", frmsize.he);
+
         // mmap initialization
 
         let mut req: v4l2::v4l2_requestbuffers = Default::default();
@@ -214,7 +221,7 @@ impl UvcView {
                     return Err(IoError {
                         kind: io::OtherIoError,
                         desc: "init(): ioctl() returns -1",
-                        detail: Some(errno_msg(errno as int))
+                        detail: Some(error_string(errno as uint))
                     });
                 }
             }
@@ -241,7 +248,7 @@ impl UvcView {
                     return Err(IoError {
                         kind: io::OtherIoError,
                         desc: "init() error",
-                        detail: Some(errno_msg(errno as int)),
+                        detail: Some(error_string(errno as uint)),
                     });
                 }
             }
@@ -270,6 +277,10 @@ impl UvcView {
         return Ok(self);
     }
 
+    pub fn set_surface(&mut self, surface: ~sdl::video::Surface) {
+        self.surface = Some(surface);
+    }
+
     pub fn start_capturing(&mut self) {
         let mut i = 0;
         for _ in self.buffers.iter() {
@@ -293,7 +304,7 @@ impl UvcView {
         match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_STREAMON, unsafe { transmute(&mut buf_type) }) {
             Ok(_) => {}
             Err(e) => {
-                fail!("VIDIOC_STERAMON failed. {}", errno_msg(e as int));
+                fail!("VIDIOC_STERAMON failed. {}", error_string(e as uint));
             }
         }
     }
@@ -304,7 +315,7 @@ impl UvcView {
         match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_STREAMOFF, unsafe { transmute(&mut buf_type) }) {
             Ok(_) => {}
             Err(e) => {
-                fail!("VIDIOC_STREAMOFF failed. {}", errno_msg(e as int));
+                fail!("VIDIOC_STREAMOFF failed. {}", error_string(e as uint));
             }
         }
     }
@@ -321,7 +332,7 @@ impl UvcView {
                 return false;
             }
             Err(e) => {
-                fail!("VIDIOC_DQBUF failed. {}", errno_msg(e as int));
+                fail!("VIDIOC_DQBUF failed. {}", error_string(e as uint));
             }
         }
 
@@ -334,14 +345,56 @@ impl UvcView {
         match v4l2::v4l2_ioctl(self.fd, v4l2::VIDIOC_QBUF, unsafe { transmute(&mut buffer) }) {
             Ok(_) => {}
             Err(e) => {
-                fail!("VIDIOC_QBUF failed. {}", errno_msg(e as int));
+                fail!("VIDIOC_QBUF failed. {}", error_string(e as uint));
             }
         }
         return true;
     }
 
-    pub fn process_image(&mut self, buffer_index: u32) {
+    fn yuv422_to_rgb(dest: *mut u8, src: *mut u8) {
+        unsafe {
+            let y0 = *src as f64;
+            let cb = *src.offset(1) as f64;
+            let y1 = *src.offset(2) as f64;
+            let cr = *src.offset(3) as f64;
+
+            *dest.offset(0) = (y0 + 1.77200 * (cb - 128.0)) as u8;
+            *dest.offset(1) = (y0 - 0.34414 * (cb - 128.0) - 0.71414 * (cr - 128.0)) as u8;
+            *dest.offset(2) = (y0 + 1.40200 * (cr - 128.0)) as u8;
+
+            *dest.offset(3) = (y1 + 1.77200 * (cb - 128.0)) as u8;
+            *dest.offset(4) = (y1 - 0.34414 * (cb - 128.0) - 0.71414 * (cr - 128.0)) as u8;
+            *dest.offset(5) = (y1 + 1.40200 * (cr - 128.0)) as u8;
+
+        }
+    }
+
+    fn process_image(&mut self, buffer_index: u32) {
         println!("buffer_index = {}", buffer_index);
+        match self.surface {
+            Some(ref surface) => {
+                surface.with_lock(|pixels| {
+                    let buffer = self.buffers.get(buffer_index as uint);
+                    let dest = pixels.as_mut_ptr();
+                    let src = buffer.memory_map.data;
+                    unsafe {
+                        let mut y: int = 0;
+                        while y < self.height as int {
+                            let mut x = 0;
+                            while x < self.width as int {
+                                UvcView::yuv422_to_rgb(
+                                    dest.offset((y * self.width as int + x) * 3),
+                                    src.offset((y * self.width as int + x) * 2));
+                                x += 2;
+                            }
+                            y += 1;
+                        }
+                    }
+                });
+                surface.flip();
+            }
+            None => {}
+        }
     }
 }
 
