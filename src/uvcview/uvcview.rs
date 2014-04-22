@@ -1,14 +1,12 @@
-use libc::consts::os::posix88::{EINVAL,EIO,MAP_SHARED,EAGAIN};
+use libc::consts::os::posix88::{EINVAL,MAP_SHARED,EAGAIN};
 use libc::{c_int,O_RDWR};
 use libc;
 use std::cast::transmute;
-use std::cmp::{min,max};
 use std::default::Default;
 use std::fmt;
 use std::io::{IoResult,IoError,OtherIoError,TypeUnknown,MismatchedFileTypeForOperation};
 use std::io;
 use std::os::error_string;
-use std::ptr::copy_memory;
 use sdl;
 use std::os;
 use std::os::{MemoryMap,MapReadable,MapWritable,MapFd,MapNonStandardFlags};
@@ -189,15 +187,16 @@ impl UvcView {
             }
         }
 
+        /*
         let mut frmsize: v4l2::v4l2_frmivalenum = Default::default();
 
         match v4l2_ioctl(self.fd, v4l2::VIDIOC_ENUM_FRAMEINTERVALS, unsafe { transmute(&mut frmsize) }) {
             Ok(_) => {}
             Err(e) => {
-                fail!("VIDIOC_ENUM_FRAMEINTERVALS failed! {}");
+                fail!("VIDIOC_ENUM_FRAMEINTERVALS failed! {}", e);
             }
-        }
-        println!("frmsize.he = {}", frmsize.he);
+        }*/
+        //println!("frmsize.he = {}", frmsize.he);
 
         // mmap initialization
 
