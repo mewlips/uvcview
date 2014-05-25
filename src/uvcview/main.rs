@@ -9,7 +9,7 @@ extern crate log;
 use getopts::{getopts,optopt,optflag,usage};
 use libc::consts::os::c95::EXIT_FAILURE;
 use libc::consts::os::posix88::{EINTR};
-use std::cast::{transmute};
+use std::mem::{transmute};
 use std::default::Default;
 use std::mem;
 use std::os;
@@ -21,27 +21,27 @@ mod uvcview;
 
 pub fn main() {
     let args = os::args();
-    let program = args[0].clone();
+    let program = args.get(0).clone();
     let description = "UVC Viewer";
 
     let mut uvcview: UvcView = Default::default();
 
     let opts = ~[
         optopt("d", "device", format!("set video device path (default: {})",
-                              uvcview.device_path.as_str().unwrap_or("<None>")),
+                              uvcview.device_path.as_str().unwrap_or("<None>")).as_slice(),
                "<device_path>"),
         optopt("x", "width", format!("set width (default: {})",
-                                     uvcview.width),
+                                     uvcview.width).as_slice(),
                "<x>"),
         optopt("y", "height", format!("set height (default: {})",
-                                      uvcview.height),
+                                      uvcview.height).as_slice(),
                "<y>"),
         optflag("h", "help", "show help messages"),
     ];
 
     let print_usage = || {
         let brief = format!("{} : {}", program, description);
-        print!("{}", usage(brief, opts));
+        print!("{}", usage(brief.as_slice(), opts));
     };
 
     let matches = match getopts(args.tail(), opts) {
@@ -66,10 +66,10 @@ pub fn main() {
         _ => {}
     }
     uvcview.width = matches.opt_str("width").map_or(uvcview.width, |s| {
-        from_str::<u32>(s).unwrap_or_else(|| { fail!("invalid option argument") })
+        from_str::<u32>(s.as_slice()).unwrap_or_else(|| { fail!("invalid option argument") })
     });
     uvcview.height = matches.opt_str("height").map_or(uvcview.height, |s| {
-        from_str::<u32>(s).unwrap_or_else(|| { fail!("invalid option argument") })
+        from_str::<u32>(s.as_slice()).unwrap_or_else(|| { fail!("invalid option argument") })
     });
 
     match uvcview.open().and_then(|uvcview| {
@@ -127,10 +127,10 @@ fn main_loop(uvcview: &mut UvcView) {
             }
         }
         loop {
-            let mut set: fd_set = unsafe { mem::init() };
+            let mut set: FdSet = unsafe { mem::zeroed() };
             let mut tv = libc::timeval { tv_sec: 2, tv_usec: 0 };
 
-            fd_set(&mut set, uvcview.fd);
+            FdSet(&mut set, uvcview.fd);
 
             let result = unsafe {
                 select(uvcview.fd + 1, transmute(&mut set),
@@ -160,18 +160,18 @@ fn main_loop(uvcview: &mut UvcView) {
 
 pub static FD_SETSIZE: uint = 1024;
 
-pub struct fd_set {
+pub struct FdSet {
     fds_bits: [u64, ..(FD_SETSIZE / 64)]
 }
 
-pub fn fd_set(set: &mut fd_set, fd: i32) {
+pub fn FdSet(set: &mut FdSet, fd: i32) {
     set.fds_bits[(fd / 64) as uint] |= (1 << (fd % 64)) as u64;
 }
 
 extern {
     pub fn select(nfds: libc::c_int,
-                  readfds: *fd_set,
-                  writefds: *fd_set,
-                  errorfds: *fd_set,
+                  readfds: *FdSet,
+                  writefds: *FdSet,
+                  errorfds: *FdSet,
                   timeout: *libc::timeval) -> libc::c_int;
 }

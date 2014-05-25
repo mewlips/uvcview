@@ -1122,10 +1122,10 @@ pub struct v4l2_frmsizeenum {
 }
 impl v4l2_frmsizeenum {
     pub fn discrete(&mut self) -> *mut v4l2_frmsize_discrete {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn stepwise(&mut self) -> *mut v4l2_frmsize_stepwise {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 impl Default for v4l2_frmsizeenum {
@@ -1159,10 +1159,10 @@ pub struct v4l2_frmivalenum {
 }
 impl v4l2_frmivalenum {
     pub fn discrete(&mut self) -> *mut v4l2_fract {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn stepwise(&mut self) -> *mut v4l2_frmival_stepwise {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 impl Default for v4l2_frmivalenum {
@@ -1237,10 +1237,10 @@ pub struct union3 {
 }
 impl union3 {
     pub fn mem_offset(&mut self) -> *mut u32 {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn userptr(&mut self) -> *mut c_ulong {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub struct v4l2_buffer {
@@ -1285,13 +1285,13 @@ pub struct union4 {
 }
 impl union4 {
     pub fn offset(&mut self) -> *mut u32 {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn userptr(&mut self) -> *mut c_ulong {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn planes(&mut self) -> *mut *mut v4l2_plane {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 impl Default for union4 {
@@ -1401,10 +1401,10 @@ pub struct v4l2_dv_timings {
 }
 impl v4l2_dv_timings {
     pub fn bt(&mut self) -> *mut v4l2_bt_timings {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn reserved(&mut self) -> *mut [u32, ..32u] {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 impl Default for v4l2_dv_timings {
@@ -1438,10 +1438,10 @@ pub struct v4l2_dv_timings_cap {
 }
 impl v4l2_dv_timings_cap {
     pub fn bt(&mut self) -> *mut v4l2_bt_timings_cap {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn raw_data(&mut self) -> *mut [u32, ..32u] {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 pub struct v4l2_input {
@@ -1477,13 +1477,13 @@ pub struct v4l2_ext_control {
 }
 impl v4l2_ext_control {
     pub fn value(&mut self) -> *mut i32 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn value64(&mut self) -> *mut i64 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn string(&mut self) -> *mut *mut c_schar {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub struct v4l2_ext_controls {
@@ -1522,10 +1522,10 @@ pub struct v4l2_querymenu {
 }
 impl v4l2_querymenu {
     pub fn name(&mut self) -> *mut [u8, ..32u] {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn value(&mut self) -> *mut i64 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 pub type v4l2_dv_tx_mode = c_uint;
@@ -1622,7 +1622,7 @@ pub struct v4l2_encoder_cmd {
 }
 impl v4l2_encoder_cmd {
     pub fn raw(&mut self) -> *mut union10 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 pub struct union10 {
@@ -1635,13 +1635,13 @@ pub struct v4l2_decoder_cmd {
 }
 impl v4l2_decoder_cmd {
     pub fn stop(&mut self) -> *mut union12 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn start(&mut self) -> *mut union13 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn raw(&mut self) -> *mut union14 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 pub struct union12 {
@@ -1700,10 +1700,10 @@ pub struct v4l2_mpeg_vbi_fmt_ivtv {
 }
 impl v4l2_mpeg_vbi_fmt_ivtv {
     pub fn itv0(&mut self) -> *mut v4l2_mpeg_vbi_itv0 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn ITV0(&mut self) -> *mut v4l2_mpeg_vbi_ITV0 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 pub struct v4l2_plane_pix_format {
@@ -1731,22 +1731,22 @@ pub struct union16 {
 }
 impl union16 {
     pub fn pix(&mut self) -> *mut v4l2_pix_format {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn pix_mp(&mut self) -> *mut v4l2_pix_format_mplane {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn win(&mut self) -> *mut v4l2_window {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn vbi(&mut self) -> *mut v4l2_vbi_format {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn sliced(&mut self) -> *mut v4l2_sliced_vbi_format {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn raw_data(&mut self) -> *mut [u8, ..200u] {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 impl Default for union16 {
@@ -1765,13 +1765,13 @@ pub struct union17 {
 }
 impl union17 {
     pub fn capture(&mut self) -> *mut v4l2_captureparm {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn output(&mut self) -> *mut v4l2_outputparm {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn raw_data(&mut self) -> *mut [u8, ..200u] {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub struct v4l2_event_vsync {
@@ -1789,10 +1789,10 @@ pub struct v4l2_event_ctrl {
 }
 impl v4l2_event_ctrl {
     pub fn value(&mut self) -> *mut i32 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn value64(&mut self) -> *mut i64 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 pub struct v4l2_event_frame_sync {
@@ -1812,16 +1812,16 @@ pub struct union19 {
 }
 impl union19 {
     pub fn vsync(&mut self) -> *mut v4l2_event_vsync {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn ctrl(&mut self) -> *mut v4l2_event_ctrl {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn frame_sync(&mut self) -> *mut v4l2_event_frame_sync {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
     pub fn data(&mut self) -> *mut [u8, ..64u] {
-        unsafe { ::std::cast::transmute(self) }
+        unsafe { ::std::mem::transmute(self) }
     }
 }
 pub struct v4l2_event_subscription {
@@ -1836,10 +1836,10 @@ pub struct v4l2_dbg_match {
 }
 impl v4l2_dbg_match {
     pub fn addr(&mut self) -> *mut u32 {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
     pub fn name(&mut self) -> *mut [c_schar, ..32u] {
-        unsafe { ::std::cast::transmute(&mut self._union) }
+        unsafe { ::std::mem::transmute(&mut self._union) }
     }
 }
 pub struct v4l2_dbg_register {

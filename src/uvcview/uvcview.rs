@@ -1,7 +1,7 @@
 use libc::consts::os::posix88::{EINVAL,MAP_SHARED,EAGAIN};
 use libc::{c_int,O_RDWR};
 use libc;
-use std::cast::transmute;
+use std::mem::transmute;
 use std::default::Default;
 use std::fmt;
 use std::io::{IoResult,IoError,OtherIoError,TypeUnknown,MismatchedFileTypeForOperation};
@@ -24,7 +24,7 @@ pub struct UvcView {
     pub width: u32,
     pub height: u32,
     pub buffers: Vec<Buffer>,
-    pub surface: Option<~sdl::video::Surface>,
+    pub surface: Option<sdl::video::Surface>,
 }
 
 impl Default for UvcView {
@@ -42,7 +42,7 @@ impl Default for UvcView {
 
 impl fmt::Show for UvcView {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f.buf, "device_path : {}\nfd : {}\nwidth : {}\nheight : {}",
+        write!(f, "device_path : {}\nfd : {}\nwidth : {}\nheight : {}",
                self.device_path.display(), self.fd, self.width, self.height)
     }
 }
@@ -60,7 +60,7 @@ impl UvcView {
                 }
             }
             Err(mut e) => {
-                e.detail = Some(~"open() failed");
+                e.detail = Some("open() failed".to_owned());
                 return Err(e);
             }
         }
@@ -276,7 +276,7 @@ impl UvcView {
         return Ok(self);
     }
 
-    pub fn set_surface(&mut self, surface: ~sdl::video::Surface) {
+    pub fn set_surface(&mut self, surface: sdl::video::Surface) {
         self.surface = Some(surface);
     }
 
